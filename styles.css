@@ -187,7 +187,7 @@ code, pre, .font-mono {
   padding: 2px 8px;
   border-radius: var(--radius-sm);
   font-family: var(--font-mono);
-  font-size: 0.8rem;
+  font-size: 1rem;
 }
 
 .status-badge {
@@ -197,7 +197,7 @@ code, pre, .font-mono {
   padding: 4px 12px;
   border-radius: 20px;
   font-weight: 500;
-  font-size: 0.8rem;
+  font-size: 1rem;
 }
 
 .status-dot {
@@ -280,7 +280,25 @@ code, pre, .font-mono {
 
 .panel-actions {
   display: flex;
+  align-items: center;
   gap: var(--space-sm);
+}
+
+.filter-checkbox {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  cursor: pointer;
+  user-select: none;
+}
+
+.filter-checkbox input[type="checkbox"] {
+  cursor: pointer;
+  width: 16px;
+  height: 16px;
+  accent-color: var(--accent-primary);
 }
 
 /* Event Triggers Panel */
@@ -338,7 +356,7 @@ code, pre, .font-mono {
   padding: var(--space-sm);
   background: var(--bg-code);
   font-family: var(--font-mono);
-  font-size: 0.8rem;
+  font-size: 1rem;
   max-height: 400px;
 }
 
@@ -384,12 +402,14 @@ code, pre, .font-mono {
 
 .log-direction {
   flex-shrink: 0;
-  width: 20px;
+  width: 24px;
   text-align: center;
+  font-size: 1.2rem;
+  font-weight: 600;
 }
 
 .log-direction.outgoing {
-  color: var(--accent-secondary);
+  color: #3b82f6;
 }
 
 .log-direction.incoming {
@@ -535,11 +555,11 @@ code, pre, .font-mono {
 
 .btn-label {
   font-weight: 600;
-  font-size: 0.8rem;
+  font-size: 1rem;
 }
 
 .btn-hint {
-  font-size: 0.65rem;
+  font-size: 0.8rem;
   color: var(--text-tertiary);
   font-family: var(--font-mono);
 }

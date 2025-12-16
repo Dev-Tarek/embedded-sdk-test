@@ -20,7 +20,8 @@
     parentOrigin: null,
     merchantData: null,
     messageLog: [],
-    isDarkMode: localStorage.getItem('theme') === 'dark'
+    isDarkMode: localStorage.getItem('theme') === 'dark',
+    filterUnknown: true
   };
 
   // ============================================
@@ -35,6 +36,7 @@
     messageLog: document.getElementById('message-log'),
     clearLog: document.getElementById('clear-log'),
     copyLog: document.getElementById('copy-log'),
+    filterUnknown: document.getElementById('filter-unknown'),
     payloadEditor: document.getElementById('payload-editor'),
     sendCustom: document.getElementById('send-custom'),
     toastContainer: document.getElementById('toast-container'),
@@ -251,6 +253,11 @@
   }
 
   function renderLogEntry(entry) {
+    // Check if we should filter this entry
+    if (state.filterUnknown && entry.event === 'unknown') {
+      return;
+    }
+
     // Remove empty state if present
     const emptyState = elements.messageLog.querySelector('.log-empty');
     if (emptyState) {
@@ -259,6 +266,7 @@
 
     const div = document.createElement('div');
     div.className = 'log-entry';
+    div.dataset.event = entry.event;
     
     const time = new Date(entry.time);
     const timeStr = time.toLocaleTimeString('en-US', { 
@@ -298,6 +306,29 @@
 
     elements.messageLog.appendChild(div);
     elements.messageLog.scrollTop = elements.messageLog.scrollHeight;
+  }
+
+  function rerenderLog() {
+    // Clear current display
+    elements.messageLog.innerHTML = '';
+    
+    // Re-render all entries with current filter
+    state.messageLog.forEach(entry => {
+      renderLogEntry(entry);
+    });
+
+    // Show empty state if no visible entries
+    if (elements.messageLog.children.length === 0) {
+      elements.messageLog.innerHTML = `
+        <div class="log-empty">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.3">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+          </svg>
+          <p>No messages yet</p>
+          <span>Click "Initialize" to start communication</span>
+        </div>
+      `;
+    }
   }
 
   function clearLog() {
@@ -438,6 +469,12 @@
     // Log actions
     elements.clearLog.addEventListener('click', clearLog);
     elements.copyLog.addEventListener('click', copyLog);
+    
+    // Filter checkbox
+    elements.filterUnknown.addEventListener('change', (e) => {
+      state.filterUnknown = e.target.checked;
+      rerenderLog();
+    });
 
     // Custom payload send
     elements.sendCustom.addEventListener('click', handleSendCustom);
