@@ -245,6 +245,7 @@ code, pre, .font-mono {
   flex: 1;
   max-width: 1600px;
   width: 100%;
+  margin: 0 auto;
 }
 
 /* ============================================
@@ -464,7 +465,7 @@ code, pre, .font-mono {
 .data-value-truncate {
   overflow: hidden;
   text-overflow: ellipsis;
-  white-space: nowrap;
+  /* white-space: nowrap; */
 }
 
 /* Editor Panel */
