@@ -20,75 +20,83 @@ All events use the `embedded::` namespace prefix.
 ### Outgoing Events (App → Host)
 
 #### Iframe Lifecycle
-| Event | Description |
-|-------|-------------|
-| `embedded::iframe.ready` | Signal app is ready, request merchant context |
-| `embedded::iframe.resize` | Request iframe height change |
+
+| Event                     | Description                                   |
+| ------------------------- | --------------------------------------------- |
+| `embedded::iframe.ready`  | Signal app is ready, request merchant context |
+| `embedded::iframe.resize` | Request iframe height change                  |
 
 #### Authentication
-| Event | Description |
-|-------|-------------|
-| `embedded::auth.logout` | Request user logout |
+
+| Event                    | Description                             |
+| ------------------------ | --------------------------------------- |
+| `embedded::auth.logout`  | Request user logout                     |
 | `embedded::auth.refresh` | Request token refresh (triggers reload) |
-| `embedded::auth.verify` | Request token verification |
+| `embedded::auth.verify`  | Request token verification              |
 
 #### Page Navigation
-| Event | Description |
-|-------|-------------|
-| `embedded::page.navigate` | SPA navigation within dashboard |
+
+| Event                     | Description                        |
+| ------------------------- | ---------------------------------- |
+| `embedded::page.navigate` | SPA navigation within dashboard    |
 | `embedded::page.redirect` | Full page redirect to external URL |
 
 #### Navigation Bar
-| Event | Description |
-|-------|-------------|
+
+| Event                     | Description                     |
+| ------------------------- | ------------------------------- |
 | `embedded::nav.setAction` | Set/clear primary action button |
 
 #### UI State
-| Event | Description |
-|-------|-------------|
-| `embedded::ui.loading` | Show/hide loading indicator |
-| `embedded::ui.breadcrumb` | Set breadcrumb navigation |
-| `embedded::ui.overlay` | Enter/exit overlay mode |
-| `embedded::ui.toast` | Show toast notification |
-| `embedded::ui.modal` | Open/close modal dialog |
+
+| Event                     | Description                 |
+| ------------------------- | --------------------------- |
+| `embedded::ui.loading`    | Show/hide loading indicator |
+| `embedded::ui.breadcrumb` | Set breadcrumb navigation   |
+| `embedded::ui.overlay`    | Enter/exit overlay mode     |
+| `embedded::ui.toast`      | Show toast notification     |
+| `embedded::ui.modal`      | Open/close modal dialog     |
 
 #### Business
-| Event | Description |
-|-------|-------------|
+
+| Event                       | Description               |
+| --------------------------- | ------------------------- |
 | `embedded::checkout.create` | Initiate checkout process |
 
 #### Error
-| Event | Description |
-|-------|-------------|
+
+| Event                    | Description          |
+| ------------------------ | -------------------- |
 | `embedded::error.report` | Report error to host |
 
 ### Incoming Events (Host → App)
 
-| Event | Description |
-|-------|-------------|
+| Event                       | Description                             |
+| --------------------------- | --------------------------------------- |
 | `embedded::context.provide` | Merchant context (token, storeId, etc.) |
-| `embedded::theme.change` | Theme changed notification |
-| `embedded::nav.actionClick` | Primary action button was clicked |
+| `embedded::theme.change`    | Theme changed notification              |
+| `embedded::nav.actionClick` | Primary action button was clicked       |
 
 ## Context Data
 
 When connected, the host provides:
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `token` | `string` | Access token for API calls |
-| `storeId` | `number` | Current store ID |
-| `userId` | `number` | Current user ID |
-| `plan` | `string` | Merchant plan name |
-| `locale` | `string` | Current locale code |
-| `isDarkMode` | `boolean` | Dark mode enabled |
-| `parentWidth` | `number` | Parent container width |
-| `baseUrl` | `string` | Dashboard base URL |
-| `baseApiUrl` | `string` | API base URL |
+| Field         | Type      | Description                |
+| ------------- | --------- | -------------------------- |
+| `token`       | `string`  | Access token for API calls |
+| `storeId`     | `number`  | Current store ID           |
+| `userId`      | `number`  | Current user ID            |
+| `plan`        | `string`  | Merchant plan name         |
+| `locale`      | `string`  | Current locale code        |
+| `isDarkMode`  | `boolean` | Dark mode enabled          |
+| `parentWidth` | `number`  | Parent container width     |
+| `baseUrl`     | `string`  | Dashboard base URL         |
+| `baseApiUrl`  | `string`  | API base URL               |
 
 ## Event Payloads
 
 ### `embedded::iframe.ready`
+
 ```json
 {
   "event": "embedded::iframe.ready",
@@ -97,6 +105,7 @@ When connected, the host provides:
 ```
 
 ### `embedded::iframe.resize`
+
 ```json
 {
   "event": "embedded::iframe.resize",
@@ -105,6 +114,7 @@ When connected, the host provides:
 ```
 
 ### `embedded::auth.logout`
+
 ```json
 {
   "event": "embedded::auth.logout",
@@ -113,6 +123,7 @@ When connected, the host provides:
 ```
 
 ### `embedded::page.navigate`
+
 ```json
 {
   "event": "embedded::page.navigate",
@@ -123,6 +134,7 @@ When connected, the host provides:
 ```
 
 ### `embedded::page.redirect`
+
 ```json
 {
   "event": "embedded::page.redirect",
@@ -131,6 +143,7 @@ When connected, the host provides:
 ```
 
 ### `embedded::nav.setAction`
+
 ```json
 {
   "event": "embedded::nav.setAction",
@@ -145,6 +158,7 @@ When connected, the host provides:
 ```
 
 ### `embedded::ui.loading`
+
 ```json
 {
   "event": "embedded::ui.loading",
@@ -154,6 +168,7 @@ When connected, the host provides:
 ```
 
 ### `embedded::ui.breadcrumb`
+
 ```json
 {
   "event": "embedded::ui.breadcrumb",
@@ -166,6 +181,7 @@ When connected, the host provides:
 ```
 
 ### `embedded::ui.overlay`
+
 ```json
 {
   "event": "embedded::ui.overlay",
@@ -174,6 +190,7 @@ When connected, the host provides:
 ```
 
 ### `embedded::ui.toast`
+
 ```json
 {
   "event": "embedded::ui.toast",
@@ -184,6 +201,7 @@ When connected, the host provides:
 ```
 
 ### `embedded::ui.modal`
+
 ```json
 {
   "event": "embedded::ui.modal",
@@ -194,6 +212,7 @@ When connected, the host provides:
 ```
 
 ### `embedded::checkout.create`
+
 ```json
 {
   "event": "embedded::checkout.create",
@@ -206,6 +225,7 @@ When connected, the host provides:
 ```
 
 ### `embedded::error.report`
+
 ```json
 {
   "event": "embedded::error.report",
