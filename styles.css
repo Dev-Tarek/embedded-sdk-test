@@ -22,6 +22,7 @@
   --accent-success: #10b981;
   --accent-warning: #f59e0b;
   --accent-danger: #ef4444;
+  --accent-info: #3b82f6;
   
   --border-color: #e2e8f0;
   --border-color-strong: #cbd5e1;
@@ -237,7 +238,7 @@ code, pre, .font-mono {
 
 .main-content {
   display: grid;
-  grid-template-columns: 320px 1fr;
+  grid-template-columns: 360px 1fr;
   gap: var(--space-lg);
   padding: var(--space-lg);
   flex: 1;
@@ -254,7 +255,7 @@ code, pre, .font-mono {
   background: var(--bg-secondary);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-lg);
-  overflow: hidden;
+  overflow: auto;
 }
 
 .panel-header {
@@ -409,7 +410,7 @@ code, pre, .font-mono {
 }
 
 .log-direction.outgoing {
-  color: #3b82f6;
+  color: var(--accent-info);
 }
 
 .log-direction.incoming {
