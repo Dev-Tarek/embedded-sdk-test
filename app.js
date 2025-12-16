@@ -5,6 +5,9 @@
  * and event logging for testing embedded iframe functionality.
  */
 
+/* eslint-env browser */
+/* global EmbeddedEvents */
+
 (function() {
   'use strict';
 
@@ -131,7 +134,7 @@
         break;
       
       default:
-        log('Received unknown event: ' + event.data.event, 'info');
+        log('Received unknown event: ' + event.data.event);
     }
   }
 
@@ -178,7 +181,7 @@
 
   function handlePrimaryActionClicked(data) {
     showToast('Primary action clicked! URL: ' + (data.url || 'N/A'), 'info');
-    log('Primary action triggered with value: ' + JSON.stringify(data), 'success');
+    log('Primary action triggered with value: ' + JSON.stringify(data));
   }
 
   // ============================================
@@ -396,7 +399,7 @@
     return div.innerHTML;
   }
 
-  function log(message, _type = 'info') {
+  function log(message) {
     console.log(`[EmbeddedSDK Test] ${message}`);
   }
 
@@ -413,7 +416,7 @@
     const hasOpener = window.opener !== null;
     
     if (!isInIframe && !hasOpener) {
-      log('Not running in iframe or popup - parent communication limited', 'warning');
+      log('Not running in iframe or popup - parent communication limited');
       elements.iframeMode.textContent = 'standalone';
     } else {
       elements.iframeMode.textContent = isInIframe ? 'iframe' : 'popup';
@@ -454,12 +457,12 @@
     // Auto-initialize if in iframe
     if (isInIframe) {
       setTimeout(() => {
-        log('Auto-sending iframe.loading event...', 'info');
+        log('Auto-sending iframe.loading event...');
         handleEventButtonClick('iframe.loading');
       }, 500);
     }
 
-    log('Embedded SDK Test Console initialized', 'success');
+    log('Embedded SDK Test Console initialized');
   }
 
   // Start the app

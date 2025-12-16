@@ -5,6 +5,8 @@
  * that can be sent to the Salla merchant dashboard parent window.
  */
 
+/* eslint-env browser */
+
 const EmbeddedEvents = {
   // ============================================
   // Lifecycle Events
