@@ -1,0 +1,18 @@
+{
+  "env": {
+    "browser": true,
+    "es2021": true
+  },
+  "parserOptions": {
+    "ecmaVersion": "latest",
+    "sourceType": "script"
+  },
+  "rules": {
+    "no-unused-vars": ["error", { "argsIgnorePattern": "^_" }]
+  },
+  "globals": {
+    "EmbeddedEvents": "readonly",
+    "IncomingEvents": "readonly"
+  }
+}
+

@@ -396,7 +396,7 @@
     return div.innerHTML;
   }
 
-  function log(message, type = 'info') {
+  function log(message, _type = 'info') {
     console.log(`[EmbeddedSDK Test] ${message}`);
   }
 
