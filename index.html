@@ -22,6 +22,7 @@
           </svg>
         </div>
         <h1 class="header-title">Embedded SDK Test Console</h1>
+        <span class="header-version">v1.0</span>
       </div>
       <div class="header-right">
         <button id="theme-toggle" class="btn btn-icon" title="Toggle Theme">
@@ -61,80 +62,99 @@
       <aside class="panel panel-triggers">
         <div class="panel-header">
           <h2 class="panel-title">Event Triggers</h2>
-          <span class="panel-subtitle">Send events to parent</span>
+          <span class="panel-subtitle">Send events to host (embedded::*)</span>
         </div>
 
-        <!-- Lifecycle Events -->
+        <!-- Iframe Lifecycle Events -->
         <section class="event-section">
           <h3 class="section-title">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <circle cx="12" cy="12" r="10"/>
               <polyline points="12,6 12,12 16,14"/>
             </svg>
-            Lifecycle
+            Iframe Lifecycle
           </h3>
           <div class="button-grid">
-            <button class="btn btn-event" data-event="iframe.loading">
-              <span class="btn-label">Initialize</span>
-              <span class="btn-hint">iframe.loading</span>
+            <button class="btn btn-event btn-primary" data-event="embedded::iframe.ready">
+              <span class="btn-label">Ready</span>
+              <span class="btn-hint">iframe.ready</span>
             </button>
-            <button class="btn btn-event" data-event="resize">
+            <button class="btn btn-event" data-event="embedded::iframe.resize">
               <span class="btn-label">Resize</span>
-              <span class="btn-hint">resize</span>
-            </button>
-            <button class="btn btn-event" data-event="loading-on">
-              <span class="btn-label">Loading On</span>
-              <span class="btn-hint">loading: true</span>
-            </button>
-            <button class="btn btn-event" data-event="loading-off">
-              <span class="btn-label">Loading Off</span>
-              <span class="btn-hint">loading: false</span>
-            </button>
-            <button class="btn btn-event" data-event="urlChange">
-              <span class="btn-label">URL Change</span>
-              <span class="btn-hint">urlChange</span>
+              <span class="btn-hint">iframe.resize</span>
             </button>
           </div>
         </section>
 
-        <!-- Navigation Events -->
+        <!-- Auth Events -->
+        <section class="event-section">
+          <h3 class="section-title">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+            </svg>
+            Authentication
+          </h3>
+          <div class="button-grid">
+            <button class="btn btn-event btn-warning" data-event="embedded::auth.logout">
+              <span class="btn-label">Logout</span>
+              <span class="btn-hint">auth.logout</span>
+            </button>
+            <button class="btn btn-event btn-warning" data-event="embedded::auth.refresh">
+              <span class="btn-label">Refresh Token</span>
+              <span class="btn-hint">auth.refresh</span>
+            </button>
+            <button class="btn btn-event" data-event="embedded::auth.verify">
+              <span class="btn-label">Verify Token</span>
+              <span class="btn-hint">auth.verify</span>
+            </button>
+          </div>
+        </section>
+
+        <!-- Page Navigation Events -->
         <section class="event-section">
           <h3 class="section-title">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
               <polyline points="9,22 9,12 15,12 15,22"/>
             </svg>
-            Navigation
+            Page Navigation
           </h3>
           <div class="button-grid">
-            <button class="btn btn-event" data-event="navigateTo">
-              <span class="btn-label">Navigate To</span>
-              <span class="btn-hint">navigateTo</span>
+            <button class="btn btn-event" data-event="embedded::page.navigate">
+              <span class="btn-label">Navigate</span>
+              <span class="btn-hint">page.navigate</span>
             </button>
-            <button class="btn btn-event" data-event="redirect">
+            <button class="btn btn-event" data-event="embedded::page.redirect">
               <span class="btn-label">Redirect</span>
-              <span class="btn-hint">redirect</span>
-            </button>
-            <button class="btn btn-event" data-event="breadcrumb">
-              <span class="btn-label">Breadcrumb</span>
-              <span class="btn-hint">breadcrumb</span>
-            </button>
-            <button class="btn btn-event" data-event="nav.primary-action">
-              <span class="btn-label">Primary Action</span>
-              <span class="btn-hint">nav.primary-action</span>
-            </button>
-            <button class="btn btn-event btn-warning" data-event="auth::required">
-              <span class="btn-label">Auth Required</span>
-              <span class="btn-hint">auth::required</span>
-            </button>
-            <button class="btn btn-event btn-warning" data-event="iframe.auth.refresh">
-              <span class="btn-label">Auth Refresh</span>
-              <span class="btn-hint">iframe.auth.refresh</span>
+              <span class="btn-hint">page.redirect</span>
             </button>
           </div>
         </section>
 
-        <!-- UI State Events -->
+        <!-- Nav Bar Events -->
+        <section class="event-section">
+          <h3 class="section-title">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="3" y1="12" x2="21" y2="12"/>
+              <line x1="3" y1="6" x2="21" y2="6"/>
+              <line x1="3" y1="18" x2="21" y2="18"/>
+            </svg>
+            Navigation Bar
+          </h3>
+          <div class="button-grid">
+            <button class="btn btn-event" data-event="embedded::nav.setAction">
+              <span class="btn-label">Set Action</span>
+              <span class="btn-hint">nav.setAction</span>
+            </button>
+            <button class="btn btn-event" data-event="embedded::nav.clearAction">
+              <span class="btn-label">Clear Action</span>
+              <span class="btn-hint">nav.setAction (clear)</span>
+            </button>
+          </div>
+        </section>
+
+        <!-- UI Events -->
         <section class="event-section">
           <h3 class="section-title">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -145,34 +165,79 @@
             UI State
           </h3>
           <div class="button-grid">
-            <button class="btn btn-event btn-toggle" data-event="overlay.open">
+            <button class="btn btn-event" data-event="embedded::ui.loading-show">
+              <span class="btn-label">Loading On</span>
+              <span class="btn-hint">ui.loading (show)</span>
+            </button>
+            <button class="btn btn-event" data-event="embedded::ui.loading-hide">
+              <span class="btn-label">Loading Off</span>
+              <span class="btn-hint">ui.loading (hide)</span>
+            </button>
+            <button class="btn btn-event" data-event="embedded::ui.breadcrumb">
+              <span class="btn-label">Breadcrumb</span>
+              <span class="btn-hint">ui.breadcrumb</span>
+            </button>
+            <button class="btn btn-event btn-toggle" data-event="embedded::ui.overlay-open">
               <span class="btn-label">Overlay Open</span>
-              <span class="btn-hint">overlay.open</span>
+              <span class="btn-hint">ui.overlay (open)</span>
             </button>
-            <button class="btn btn-event" data-event="overlay.close">
+            <button class="btn btn-event" data-event="embedded::ui.overlay-close">
               <span class="btn-label">Overlay Close</span>
-              <span class="btn-hint">overlay.close</span>
-            </button>
-            <button class="btn btn-event btn-toggle" data-event="doka.open">
-              <span class="btn-label">Doka Open</span>
-              <span class="btn-hint">doka.open</span>
-            </button>
-            <button class="btn btn-event" data-event="doka.close">
-              <span class="btn-label">Doka Close</span>
-              <span class="btn-hint">doka.close</span>
-            </button>
-            <button class="btn btn-event btn-toggle" data-event="open_salla_gpt">
-              <span class="btn-label">GPT Open</span>
-              <span class="btn-hint">open_salla_gpt</span>
-            </button>
-            <button class="btn btn-event" data-event="close_salla_gpt">
-              <span class="btn-label">GPT Close</span>
-              <span class="btn-hint">close_salla_gpt</span>
+              <span class="btn-hint">ui.overlay (close)</span>
             </button>
           </div>
         </section>
 
-        <!-- Business Events -->
+        <!-- Toast Events -->
+        <section class="event-section">
+          <h3 class="section-title">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M22 17H2a3 3 0 0 0 3-3V9a7 7 0 0 1 14 0v5a3 3 0 0 0 3 3zm-8.27 4a2 2 0 0 1-3.46 0"/>
+            </svg>
+            Toast Notifications
+          </h3>
+          <div class="button-grid">
+            <button class="btn btn-event btn-success" data-event="embedded::ui.toast-success">
+              <span class="btn-label">Success</span>
+              <span class="btn-hint">ui.toast (success)</span>
+            </button>
+            <button class="btn btn-event btn-danger" data-event="embedded::ui.toast-error">
+              <span class="btn-label">Error</span>
+              <span class="btn-hint">ui.toast (error)</span>
+            </button>
+            <button class="btn btn-event btn-warning" data-event="embedded::ui.toast-warning">
+              <span class="btn-label">Warning</span>
+              <span class="btn-hint">ui.toast (warning)</span>
+            </button>
+            <button class="btn btn-event btn-info" data-event="embedded::ui.toast-info">
+              <span class="btn-label">Info</span>
+              <span class="btn-hint">ui.toast (info)</span>
+            </button>
+          </div>
+        </section>
+
+        <!-- Modal Events -->
+        <section class="event-section">
+          <h3 class="section-title">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="18" height="18" rx="2"/>
+              <path d="M3 9h18"/>
+            </svg>
+            Modal
+          </h3>
+          <div class="button-grid">
+            <button class="btn btn-event btn-toggle" data-event="embedded::ui.modal-open">
+              <span class="btn-label">Open Modal</span>
+              <span class="btn-hint">ui.modal (open)</span>
+            </button>
+            <button class="btn btn-event" data-event="embedded::ui.modal-close">
+              <span class="btn-label">Close Modal</span>
+              <span class="btn-hint">ui.modal (close)</span>
+            </button>
+          </div>
+        </section>
+
+        <!-- Checkout Events -->
         <section class="event-section">
           <h3 class="section-title">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -180,40 +245,30 @@
               <line x1="3" y1="6" x2="21" y2="6"/>
               <path d="M16 10a4 4 0 0 1-8 0"/>
             </svg>
-            Business Events
+            Checkout
           </h3>
           <div class="button-grid">
-            <button class="btn btn-event btn-accent" data-event="checkout.create">
-              <span class="btn-label">Checkout</span>
+            <button class="btn btn-event btn-accent" data-event="embedded::checkout.create">
+              <span class="btn-label">Create Checkout</span>
               <span class="btn-hint">checkout.create</span>
             </button>
-            <button class="btn btn-event btn-accent" data-event="coupon.created">
-              <span class="btn-label">Coupon</span>
-              <span class="btn-hint">coupon.created</span>
-            </button>
-            <button class="btn btn-event btn-accent" data-event="page.added">
-              <span class="btn-label">Page Added</span>
-              <span class="btn-hint">page.added</span>
-            </button>
-            <button class="btn btn-event btn-accent" data-event="adBanner.create">
-              <span class="btn-label">Ad Banner</span>
-              <span class="btn-hint">adBanner.create</span>
-            </button>
-            <button class="btn btn-event btn-accent" data-event="abandonedCartReminder.sent">
-              <span class="btn-label">Cart Reminder</span>
-              <span class="btn-hint">abandonedCartReminder.sent</span>
-            </button>
-            <button class="btn btn-event btn-accent" data-event="store.identity.added">
-              <span class="btn-label">Store Identity</span>
-              <span class="btn-hint">store.identity.added</span>
-            </button>
-            <button class="btn btn-event btn-accent" data-event="sbc.added">
-              <span class="btn-label">SBC Added</span>
-              <span class="btn-hint">sbc.added</span>
-            </button>
-            <button class="btn btn-event btn-accent" data-event="dispatchMobileEvent">
-              <span class="btn-label">Mobile Event</span>
-              <span class="btn-hint">dispatchMobileEvent</span>
+          </div>
+        </section>
+
+        <!-- Error Reporting -->
+        <section class="event-section">
+          <h3 class="section-title">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/>
+              <line x1="12" y1="8" x2="12" y2="12"/>
+              <line x1="12" y1="16" x2="12.01" y2="16"/>
+            </svg>
+            Error Reporting
+          </h3>
+          <div class="button-grid">
+            <button class="btn btn-event btn-danger" data-event="embedded::error.report">
+              <span class="btn-label">Report Error</span>
+              <span class="btn-hint">error.report</span>
             </button>
           </div>
         </section>
@@ -255,7 +310,7 @@
                 <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
               </svg>
               <p>No messages yet</p>
-              <span>Click "Initialize" to start communication</span>
+              <span>Click "Ready" to start communication</span>
             </div>
           </div>
         </section>
@@ -265,7 +320,7 @@
           <div class="panel-header">
             <div>
               <h2 class="panel-title">Received Data</h2>
-              <span class="panel-subtitle">Data from parent window</span>
+              <span class="panel-subtitle">Context from host (embedded::context.provide)</span>
             </div>
           </div>
           <div id="received-data" class="data-container">
@@ -281,6 +336,10 @@
               <div class="data-item">
                 <span class="data-label">Plan</span>
                 <span id="data-plan" class="data-value">—</span>
+              </div>
+              <div class="data-item">
+                <span class="data-label">Locale</span>
+                <span id="data-locale" class="data-value">—</span>
               </div>
               <div class="data-item">
                 <span class="data-label">Dark Mode</span>
@@ -325,8 +384,8 @@
           </div>
           <div class="editor-container">
             <textarea id="payload-editor" class="payload-textarea" spellcheck="false">{
-  "event": "custom.event",
-  "data": {}
+  "event": "embedded::iframe.ready",
+  "height": 600
 }</textarea>
           </div>
         </section>
@@ -341,4 +400,3 @@
   <script src="app.js"></script>
 </body>
 </html>
-

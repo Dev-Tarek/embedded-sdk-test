@@ -1,6 +1,7 @@
 /**
  * Embedded SDK Test Console - Main Application
  * 
+ * Updated to use the new embedded:: namespaced events.
  * Handles postMessage communication, UI interactions,
  * and event logging for testing embedded iframe functionality.
  */
@@ -45,6 +46,7 @@
     dataStoreId: document.getElementById('data-store-id'),
     dataUserId: document.getElementById('data-user-id'),
     dataPlan: document.getElementById('data-plan'),
+    dataLocale: document.getElementById('data-locale'),
     dataDarkMode: document.getElementById('data-dark-mode'),
     dataToken: document.getElementById('data-token'),
     dataBaseUrl: document.getElementById('data-base-url'),
@@ -119,12 +121,22 @@
     if (!event.data || !event.data.event) return;
 
     switch (event.data.event) {
-      case 'iframe.loading':
-        handleIframeLoadingResponse(event.data);
+      // New namespaced events
+      case 'embedded::context.provide':
+        handleContextProvide(event.data);
         break;
       
-      case 'iframe.legacy.auth':
-        handleLegacyAuth(event.data);
+      case 'embedded::theme.change':
+        handleThemeChange(event.data);
+        break;
+      
+      case 'embedded::nav.actionClick':
+        handleNavActionClick(event.data);
+        break;
+
+      // Legacy event support (for backwards compatibility during transition)
+      case 'iframe.loading':
+        handleLegacyIframeLoading(event.data);
         break;
       
       case 'salla::theme.change':
@@ -132,23 +144,55 @@
         break;
       
       case 'nav.primary-action.clicked':
-        handlePrimaryActionClicked(event.data);
+        handleNavActionClick(event.data);
         break;
       
       default:
-        log('Received unknown event: ' + event.data.event);
+        log('Received event: ' + event.data.event);
     }
   }
 
-  function handleIframeLoadingResponse(data) {
+  /**
+   * Handle new context.provide event (replaces iframe.loading response)
+   */
+  function handleContextProvide(data) {
     state.merchantData = data;
     
-    // Update data display
+    // Update data display with new field names
     updateDataDisplay({
-      storeId: data['s-store-id'],
+      storeId: data.storeId,
       userId: data.userId,
       plan: data.plan,
-      darkMode: data.dark,
+      locale: data.locale,
+      darkMode: data.isDarkMode,
+      token: data.token,
+      baseUrl: data.baseUrl,
+      baseApiUrl: data.baseApiUrl,
+      parentWidth: data.parentWidth
+    });
+
+    // Apply theme from parent if specified
+    if (typeof data.isDarkMode === 'boolean') {
+      state.isDarkMode = data.isDarkMode;
+      applyTheme();
+    }
+
+    showToast('Connected! Received merchant context.', 'success');
+  }
+
+  /**
+   * Legacy support for old iframe.loading response
+   */
+  function handleLegacyIframeLoading(data) {
+    state.merchantData = data;
+    
+    // Map old field names to new format
+    updateDataDisplay({
+      storeId: data['s-store-id'] || data.storeId,
+      userId: data.userId,
+      plan: data.plan,
+      locale: data.locale,
+      darkMode: data.dark ?? data.isDarkMode,
       token: data.token,
       baseUrl: data.baseUrl,
       baseApiUrl: data.baseApiUrl,
@@ -161,29 +205,22 @@
       applyTheme();
     }
 
-    showToast('Connected! Received merchant data.', 'success');
-  }
-
-  function handleLegacyAuth(data) {
-    if (data.token) {
-      elements.dataToken.textContent = maskToken(data.token);
-      elements.dataToken.title = data.token;
-      showToast('Received legacy auth token', 'info');
-    }
+    showToast('Connected! (Legacy response)', 'info');
   }
 
   function handleThemeChange(data) {
-    if (typeof data.dark === 'boolean') {
-      state.isDarkMode = data.dark;
+    const isDark = data.dark ?? data.isDarkMode;
+    if (typeof isDark === 'boolean') {
+      state.isDarkMode = isDark;
       applyTheme();
-      elements.dataDarkMode.textContent = data.dark ? 'Enabled' : 'Disabled';
-      showToast('Theme changed by parent: ' + (data.dark ? 'Dark' : 'Light'), 'info');
+      elements.dataDarkMode.textContent = isDark ? 'Enabled' : 'Disabled';
+      showToast('Theme changed by host: ' + (isDark ? 'Dark' : 'Light'), 'info');
     }
   }
 
-  function handlePrimaryActionClicked(data) {
-    showToast('Primary action clicked! URL: ' + (data.url || 'N/A'), 'info');
-    log('Primary action triggered with value: ' + JSON.stringify(data));
+  function handleNavActionClick(data) {
+    showToast(`Action clicked! URL: ${data.url || 'N/A'}, Value: ${data.value || 'N/A'}`, 'info');
+    log('Nav action triggered: ' + JSON.stringify(data));
   }
 
   // ============================================
@@ -209,6 +246,7 @@
     if (data.storeId) elements.dataStoreId.textContent = data.storeId;
     if (data.userId) elements.dataUserId.textContent = data.userId;
     if (data.plan) elements.dataPlan.textContent = data.plan;
+    if (data.locale) elements.dataLocale.textContent = data.locale;
     if (typeof data.darkMode === 'boolean') {
       elements.dataDarkMode.textContent = data.darkMode ? 'Enabled' : 'Disabled';
     }
@@ -280,11 +318,14 @@
     const directionIcon = entry.direction === 'outgoing' ? '→' : '←';
     const directionClass = entry.direction;
     
+    // Format event name for display (remove embedded:: prefix for brevity)
+    const displayEvent = entry.event.replace('embedded::', '');
+    
     let dataStr = '';
     try {
       dataStr = JSON.stringify(entry.data, null, 0);
-      if (dataStr.length > 100) {
-        dataStr = dataStr.substring(0, 100) + '...';
+      if (dataStr.length > 80) {
+        dataStr = dataStr.substring(0, 80) + '...';
       }
     } catch (e) {
       dataStr = String(entry.data);
@@ -293,7 +334,7 @@
     div.innerHTML = `
       <span class="log-time">${timeStr}</span>
       <span class="log-direction ${directionClass}">${directionIcon}</span>
-      <span class="log-event">${entry.event}</span>
+      <span class="log-event">${escapeHtml(displayEvent)}</span>
       <span class="log-data">${escapeHtml(dataStr)}</span>
     `;
 
@@ -325,7 +366,7 @@
             <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
           </svg>
           <p>No messages yet</p>
-          <span>Click "Initialize" to start communication</span>
+          <span>Click "Ready" to start communication</span>
         </div>
       `;
     }
@@ -339,7 +380,7 @@
           <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
         </svg>
         <p>No messages yet</p>
-        <span>Click "Initialize" to start communication</span>
+        <span>Click "Ready" to start communication</span>
       </div>
     `;
     showToast('Log cleared', 'info');
@@ -380,10 +421,8 @@
     let payload = JSON.parse(JSON.stringify(eventDef.payload));
     
     // Update dynamic values
-    if (eventName === 'iframe.loading') {
+    if (eventName === 'embedded::iframe.ready') {
       payload.height = document.body.scrollHeight || 600;
-    } else if (eventName === 'urlChange') {
-      payload.url = window.location.href;
     }
 
     // Update editor with current payload
@@ -494,12 +533,12 @@
     // Auto-initialize if in iframe
     if (isInIframe) {
       setTimeout(() => {
-        log('Auto-sending iframe.loading event...');
-        handleEventButtonClick('iframe.loading');
+        log('Auto-sending embedded::iframe.ready event...');
+        handleEventButtonClick('embedded::iframe.ready');
       }, 500);
     }
 
-    log('Embedded SDK Test Console initialized');
+    log('Embedded SDK Test Console initialized (v2.0 - New Events)');
   }
 
   // Start the app
@@ -510,4 +549,3 @@
   }
 
 })();
-

@@ -1,26 +1,25 @@
 /**
  * Embedded SDK Test Console - Event Definitions
  * 
- * This file contains all event definitions and their default payloads
- * that can be sent to the Salla merchant dashboard parent window.
+ * Updated to match the new EmbeddedPage component event contract.
+ * All events use the `embedded::` namespace prefix.
  */
 
 /* eslint-env browser */
 
 const EmbeddedEvents = {
   // ============================================
-  // Lifecycle Events
+  // Iframe Lifecycle Events
   // ============================================
   
   /**
-   * Initialize iframe communication
-   * Sent when the embedded page loads to request merchant data
+   * Signal iframe is ready and request merchant context
    */
-  'iframe.loading': {
-    category: 'lifecycle',
-    description: 'Initialize communication and request merchant data',
+  'embedded::iframe.ready': {
+    category: 'iframe',
+    description: 'Signal iframe is ready, request merchant context from host',
     payload: {
-      event: 'iframe.loading',
+      event: 'embedded::iframe.ready',
       height: document.body.scrollHeight || 600
     }
   },
@@ -28,109 +27,103 @@ const EmbeddedEvents = {
   /**
    * Request iframe resize
    */
-  'resize': {
-    category: 'lifecycle',
+  'embedded::iframe.resize': {
+    category: 'iframe',
     description: 'Request iframe height change',
     payload: {
-      event: 'resize',
-      value: 800
+      event: 'embedded::iframe.resize',
+      height: 800
     },
-    configurable: ['value']
-  },
-
-  /**
-   * Set loading state ON
-   */
-  'loading-on': {
-    category: 'lifecycle',
-    description: 'Show loading indicator (full page)',
-    payload: {
-      event: 'loading',
-      status: false,
-      mode: 'full'
-    }
-  },
-
-  /**
-   * Set loading state OFF
-   */
-  'loading-off': {
-    category: 'lifecycle',
-    description: 'Hide loading indicator',
-    payload: {
-      event: 'loading',
-      status: true,
-      mode: 'full'
-    }
-  },
-
-  /**
-   * Notify URL change
-   */
-  'urlChange': {
-    category: 'lifecycle',
-    description: 'Notify parent of URL change',
-    payload: {
-      event: 'urlChange',
-      url: window.location.href
-    }
+    configurable: ['height']
   },
 
   // ============================================
-  // Navigation Events
+  // Authentication Events
   // ============================================
 
   /**
-   * Navigate to a path
+   * Request logout
    */
-  'navigateTo': {
-    category: 'navigation',
-    description: 'Navigate to a specific path in the dashboard',
+  'embedded::auth.logout': {
+    category: 'auth',
+    description: 'Request user logout',
     payload: {
-      event: 'navigateTo',
-      path: '/products'
+      event: 'embedded::auth.logout',
+      redirectUrl: '/auth/login'
     },
-    configurable: ['path']
+    configurable: ['redirectUrl'],
+    warning: 'This will log out the user!'
   },
 
   /**
-   * Redirect (alias for navigateTo)
+   * Request token refresh
    */
-  'redirect': {
-    category: 'navigation',
-    description: 'Redirect to a path (same as navigateTo)',
+  'embedded::auth.refresh': {
+    category: 'auth',
+    description: 'Request token refresh (triggers page reload)',
     payload: {
-      event: 'redirect',
-      path: '/orders'
+      event: 'embedded::auth.refresh'
     },
-    configurable: ['path']
+    warning: 'This will reload the page!'
   },
 
   /**
-   * Set breadcrumb items
+   * Request token verification
    */
-  'breadcrumb': {
-    category: 'navigation',
-    description: 'Set custom breadcrumb navigation',
+  'embedded::auth.verify': {
+    category: 'auth',
+    description: 'Request token verification via API',
     payload: {
-      event: 'breadcrumb',
-      data: [
-        { label: 'Home', path: '/' },
-        { label: 'Products', path: '/products' },
-        { label: 'Edit Product', path: null }
-      ]
+      event: 'embedded::auth.verify',
+      token: ''
     },
-    configurable: ['data']
+    configurable: ['token']
+  },
+
+  // ============================================
+  // Page Navigation Events
+  // ============================================
+
+  /**
+   * Navigate to internal path (SPA)
+   */
+  'embedded::page.navigate': {
+    category: 'page',
+    description: 'Navigate to internal dashboard path (SPA navigation)',
+    payload: {
+      event: 'embedded::page.navigate',
+      path: '/products',
+      state: {},
+      replace: false
+    },
+    configurable: ['path', 'state', 'replace']
   },
 
   /**
-   * Set primary navigation action
+   * Redirect to external URL
    */
-  'nav.primary-action': {
-    category: 'navigation',
-    description: 'Set primary action button in navigation',
+  'embedded::page.redirect': {
+    category: 'page',
+    description: 'Redirect to external URL (full page redirect)',
     payload: {
-      event: 'nav.primary-action',
+      event: 'embedded::page.redirect',
+      url: 'https://salla.sa'
+    },
+    configurable: ['url']
+  },
+
+  // ============================================
+  // Navigation Bar Events
+  // ============================================
+
+  /**
+   * Set primary navigation action button
+   */
+  'embedded::nav.setAction': {
+    category: 'nav',
+    description: 'Set primary action button in navigation bar',
+    payload: {
+      event: 'embedded::nav.setAction',
       title: 'Add Product',
       url: '/products/new',
       value: 'create',
@@ -143,111 +136,191 @@ const EmbeddedEvents = {
   },
 
   /**
-   * Request authentication redirect
+   * Clear primary navigation action
    */
-  'auth::required': {
-    category: 'navigation',
-    description: 'Request authentication (redirects to login)',
+  'embedded::nav.clearAction': {
+    category: 'nav',
+    description: 'Clear primary action button',
     payload: {
-      event: 'auth::required'
+      event: 'embedded::nav.setAction',
+      title: ''
+    }
+  },
+
+  // ============================================
+  // UI Events
+  // ============================================
+
+  /**
+   * Show loading indicator
+   */
+  'embedded::ui.loading-show': {
+    category: 'ui',
+    description: 'Show loading indicator (content not ready)',
+    payload: {
+      event: 'embedded::ui.loading',
+      status: false,
+      mode: 'full'
     },
-    warning: 'This will redirect the user to the auth page!'
+    configurable: ['mode']
   },
 
   /**
-   * Request auth refresh
+   * Hide loading indicator
    */
-  'iframe.auth.refresh': {
-    category: 'navigation',
-    description: 'Request page reload for auth refresh',
+  'embedded::ui.loading-hide': {
+    category: 'ui',
+    description: 'Hide loading indicator (content ready)',
     payload: {
-      event: 'iframe.auth.refresh'
+      event: 'embedded::ui.loading',
+      status: true,
+      mode: 'full'
     },
-    warning: 'This will reload the page!'
+    configurable: ['mode']
   },
 
-  // ============================================
-  // UI State Events
-  // ============================================
+  /**
+   * Set breadcrumb navigation
+   */
+  'embedded::ui.breadcrumb': {
+    category: 'ui',
+    description: 'Set custom breadcrumb navigation',
+    payload: {
+      event: 'embedded::ui.breadcrumb',
+      items: [
+        { label: 'Home', path: '/' },
+        { label: 'Products', path: '/products' },
+        { label: 'Edit Product' }
+      ]
+    },
+    configurable: ['items']
+  },
 
   /**
    * Open overlay mode
    */
-  'overlay.open': {
+  'embedded::ui.overlay-open': {
     category: 'ui',
-    description: 'Open overlay/modal mode',
+    description: 'Enter fullscreen overlay mode',
     payload: {
-      event: 'overlay.open'
+      event: 'embedded::ui.overlay',
+      action: 'open'
     }
   },
 
   /**
    * Close overlay mode
    */
-  'overlay.close': {
+  'embedded::ui.overlay-close': {
     category: 'ui',
-    description: 'Close overlay/modal mode',
+    description: 'Exit overlay mode',
     payload: {
-      event: 'overlay.close'
+      event: 'embedded::ui.overlay',
+      action: 'close'
     }
   },
 
   /**
-   * Open Doka image editor
+   * Show success toast
    */
-  'doka.open': {
+  'embedded::ui.toast-success': {
     category: 'ui',
-    description: 'Open Doka image editor overlay',
+    description: 'Show success toast notification',
     payload: {
-      event: 'doka.open'
-    }
+      event: 'embedded::ui.toast',
+      type: 'success',
+      message: 'Operation completed successfully!',
+      duration: 3000
+    },
+    configurable: ['message', 'duration']
   },
 
   /**
-   * Close Doka image editor
+   * Show error toast
    */
-  'doka.close': {
+  'embedded::ui.toast-error': {
     category: 'ui',
-    description: 'Close Doka image editor overlay',
+    description: 'Show error toast notification',
     payload: {
-      event: 'doka.close'
-    }
+      event: 'embedded::ui.toast',
+      type: 'error',
+      message: 'Something went wrong!',
+      duration: 5000
+    },
+    configurable: ['message', 'duration']
   },
 
   /**
-   * Open Salla GPT widget
+   * Show warning toast
    */
-  'open_salla_gpt': {
+  'embedded::ui.toast-warning': {
     category: 'ui',
-    description: 'Open Salla GPT chat widget',
+    description: 'Show warning toast notification',
     payload: {
-      event: 'open_salla_gpt'
-    }
+      event: 'embedded::ui.toast',
+      type: 'warning',
+      message: 'Please review your input',
+      duration: 4000
+    },
+    configurable: ['message', 'duration']
   },
 
   /**
-   * Close Salla GPT widget
+   * Show info toast
    */
-  'close_salla_gpt': {
+  'embedded::ui.toast-info': {
     category: 'ui',
-    description: 'Close Salla GPT chat widget',
+    description: 'Show info toast notification',
     payload: {
-      event: 'close_salla_gpt'
-    }
+      event: 'embedded::ui.toast',
+      type: 'info',
+      message: 'New features available',
+      duration: 3000
+    },
+    configurable: ['message', 'duration']
+  },
+
+  /**
+   * Open modal
+   */
+  'embedded::ui.modal-open': {
+    category: 'ui',
+    description: 'Open a modal dialog',
+    payload: {
+      event: 'embedded::ui.modal',
+      action: 'open',
+      id: 'confirm-dialog',
+      content: { title: 'Confirm Action', body: 'Are you sure?' }
+    },
+    configurable: ['id', 'content']
+  },
+
+  /**
+   * Close modal
+   */
+  'embedded::ui.modal-close': {
+    category: 'ui',
+    description: 'Close a modal dialog',
+    payload: {
+      event: 'embedded::ui.modal',
+      action: 'close',
+      id: 'confirm-dialog'
+    },
+    configurable: ['id']
   },
 
   // ============================================
-  // Business Events
+  // Checkout Events
   // ============================================
 
   /**
-   * Checkout created event
+   * Create checkout
    */
-  'checkout.create': {
-    category: 'business',
-    description: 'Dispatch checkout creation event',
+  'embedded::checkout.create': {
+    category: 'checkout',
+    description: 'Initiate checkout process',
     payload: {
-      event: 'checkout.create',
+      event: 'embedded::checkout.create',
       payload: {
         checkoutId: 'CHK_' + Date.now(),
         amount: 299.99,
@@ -260,153 +333,59 @@ const EmbeddedEvents = {
     configurable: ['payload']
   },
 
+  // ============================================
+  // Error Reporting Events
+  // ============================================
+
   /**
-   * Coupon created event
+   * Report error
    */
-  'coupon.created': {
-    category: 'business',
-    description: 'Dispatch coupon creation event',
+  'embedded::error.report': {
+    category: 'error',
+    description: 'Report an error to the host for logging',
     payload: {
-      event: 'coupon.created',
-      payload: {
-        code: 'SAVE20',
-        discount: 20,
-        type: 'percentage',
-        expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
+      event: 'embedded::error.report',
+      error: {
+        name: 'TestError',
+        message: 'This is a test error',
+        stack: 'Error: This is a test error\n    at TestConsole (test.js:1:1)'
+      },
+      context: {
+        component: 'TestConsole',
+        action: 'test-error-reporting'
       }
     },
-    configurable: ['payload']
-  },
-
-  /**
-   * Page added event
-   */
-  'page.added': {
-    category: 'business',
-    description: 'Dispatch page added event',
-    payload: {
-      event: 'page.added',
-      payload: 'custom_page'
-    },
-    configurable: ['payload']
-  },
-
-  /**
-   * Ad banner created event
-   */
-  'adBanner.create': {
-    category: 'business',
-    description: 'Dispatch ad banner creation event',
-    payload: {
-      event: 'adBanner.create',
-      payload: {
-        id: 'BANNER_' + Date.now(),
-        title: 'Summer Sale',
-        imageUrl: 'https://example.com/banner.jpg',
-        targetUrl: '/promotions/summer'
-      }
-    },
-    configurable: ['payload']
-  },
-
-  /**
-   * Abandoned cart reminder sent
-   */
-  'abandonedCartReminder.sent': {
-    category: 'business',
-    description: 'Dispatch abandoned cart reminder event',
-    payload: {
-      event: 'abandonedCartReminder.sent',
-      payload: {
-        cartId: 'CART_' + Date.now(),
-        customerId: 'CUST_12345',
-        reminderType: 'email',
-        sentAt: new Date().toISOString()
-      }
-    },
-    configurable: ['payload']
-  },
-
-  /**
-   * Store identity added
-   */
-  'store.identity.added': {
-    category: 'business',
-    description: 'Dispatch store identity event',
-    payload: {
-      event: 'store.identity.added',
-      payload: {
-        platform: 'instagram',
-        handle: '@mystore',
-        url: 'https://instagram.com/mystore'
-      }
-    },
-    configurable: ['payload']
-  },
-
-  /**
-   * SBC (Saudi Business Center) added
-   */
-  'sbc.added': {
-    category: 'business',
-    description: 'Dispatch SBC number added event',
-    payload: {
-      event: 'sbc.added',
-      payload: '1234567890'
-    },
-    configurable: ['payload']
-  },
-
-  /**
-   * Dispatch mobile event
-   */
-  'dispatchMobileEvent': {
-    category: 'business',
-    description: 'Dispatch custom mobile app event',
-    payload: {
-      event: 'dispatchMobileEvent',
-      eventName: 'custom.mobile.event',
-      payload: {
-        action: 'test',
-        data: { key: 'value' }
-      }
-    },
-    configurable: ['eventName', 'payload']
+    configurable: ['error', 'context']
   }
 };
 
 /**
- * Events that the parent window may send to the iframe
+ * Events that the parent window (host) may send to the iframe
  */
 const IncomingEvents = {
-  'iframe.loading': {
-    description: 'Response with merchant data, token, and settings',
+  'embedded::context.provide': {
+    description: 'Merchant context data sent after iframe.ready',
     expectedFields: [
-      's-store-id',
-      'plan',
-      'userId',
-      'parentWidth',
-      'dark',
       'token',
+      'storeId',
+      'userId',
+      'plan',
+      'isDarkMode',
+      'parentWidth',
       'baseUrl',
       'baseApiUrl',
-      'legacy'
+      'locale'
     ]
   },
   
-  'iframe.legacy.auth': {
-    description: 'Legacy auth token for app mode',
-    expectedFields: ['token']
-  },
-  
-  'salla::theme.change': {
-    description: 'Theme change notification',
+  'embedded::theme.change': {
+    description: 'Theme change notification from host',
     expectedFields: ['dark']
   },
   
-  'nav.primary-action.clicked': {
-    description: 'Primary action button was clicked',
-    expectedFields: ['url']
+  'embedded::nav.actionClick': {
+    description: 'Primary action button was clicked by user',
+    expectedFields: ['url', 'value']
   }
 };
 
@@ -415,4 +394,3 @@ if (typeof window !== 'undefined') {
   window.EmbeddedEvents = EmbeddedEvents;
   window.IncomingEvents = IncomingEvents;
 }
-

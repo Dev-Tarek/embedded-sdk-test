@@ -1,0 +1,4 @@
+LOCAL_NOTES.md
+
+#Ignore cursor AI rules
+.cursor/rules/codacy.mdc

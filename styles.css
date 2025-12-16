@@ -581,6 +581,27 @@ code, pre, .font-mono {
   border-left: 3px solid var(--accent-primary);
 }
 
+.btn-success {
+  border-left: 3px solid var(--accent-success);
+}
+
+.btn-danger {
+  border-left: 3px solid var(--accent-danger);
+}
+
+.btn-info {
+  border-left: 3px solid var(--accent-info);
+}
+
+.header-version {
+  font-size: 0.7rem;
+  padding: 2px 8px;
+  background: var(--accent-primary);
+  color: white;
+  border-radius: var(--radius-sm);
+  font-weight: 500;
+}
+
 /* Theme Toggle */
 #theme-toggle .icon-moon {
   display: none;
