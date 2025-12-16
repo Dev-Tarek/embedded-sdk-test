@@ -189,6 +189,7 @@ code, pre, .font-mono {
   border-radius: var(--radius-sm);
   font-family: var(--font-mono);
   font-size: 1rem;
+  word-break: break-all;
 }
 
 .status-badge {
@@ -238,12 +239,11 @@ code, pre, .font-mono {
 
 .main-content {
   display: grid;
-  grid-template-columns: 360px 1fr;
+  grid-template-columns: auto 1fr;
   gap: var(--space-lg);
   padding: var(--space-lg);
   flex: 1;
   max-width: 1600px;
-  margin: 0 auto;
   width: 100%;
 }
 
@@ -345,7 +345,6 @@ code, pre, .font-mono {
 
 /* Log Panel */
 .panel-log {
-  flex: 1;
   min-height: 300px;
   display: flex;
   flex-direction: column;
@@ -555,11 +554,13 @@ code, pre, .font-mono {
 }
 
 .btn-label {
+  text-align: start;
   font-weight: 600;
   font-size: 1rem;
 }
 
 .btn-hint {
+  text-align: start;
   font-size: 0.8rem;
   color: var(--text-tertiary);
   font-family: var(--font-mono);

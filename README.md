@@ -1,4 +1,4 @@
-# Embedded SDK Test Console v2.0
+# Embedded SDK Test Console v1.0
 
 A developer testing tool for the Salla Embedded SDK postMessage communication.
 
