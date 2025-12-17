@@ -1,9 +1,5 @@
 /**
  * Embedded SDK Test Console - Main Application
- *
- * Updated to use the new embedded:: namespaced events.
- * Handles postMessage communication, UI interactions,
- * and event logging for testing embedded iframe functionality.
  */
 
 /* eslint-env browser */
@@ -479,52 +475,84 @@ import { EmbeddedEvents } from "./events.js";
           break;
 
         case "embedded::ui.loading-show":
-          embedded.ui.showLoading(payload.mode);
+          embedded.ui.loading.show(payload.mode);
           break;
 
         case "embedded::ui.loading-hide":
-          embedded.ui.hideLoading();
+          embedded.ui.loading.hide();
           break;
 
         case "embedded::ui.breadcrumb":
-          embedded.ui.setBreadcrumbs(payload.items);
+          embedded.ui.breadcrumbs.set(payload.items);
+          break;
+
+        case "embedded::ui.breadcrumb-clear":
+          embedded.ui.breadcrumbs.clear();
           break;
 
         case "embedded::ui.overlay-open":
-          embedded.ui.openOverlay();
+          embedded.ui.overlay.open();
           break;
 
         case "embedded::ui.overlay-close":
-          embedded.ui.closeOverlay();
+          embedded.ui.overlay.close();
           break;
 
         case "embedded::ui.toast-success":
-        case "embedded::ui.toast-error":
-        case "embedded::ui.toast-warning":
-        case "embedded::ui.toast-info": {
-          const type = payload.type || "info";
-          const message = payload.message;
-          const duration = payload.duration;
-
-          if (type === "success") {
-            embedded.ui.success(message, duration);
-          } else if (type === "error") {
-            embedded.ui.error(message, duration);
-          } else if (type === "warning") {
-            embedded.ui.warning(message, duration);
-          } else {
-            embedded.ui.info(message, duration);
-          }
+          embedded.ui.toast.success(payload.message, payload.duration);
           break;
-        }
+
+        case "embedded::ui.toast-error":
+          embedded.ui.toast.error(payload.message, payload.duration);
+          break;
+
+        case "embedded::ui.toast-warning":
+          embedded.ui.toast.warning(payload.message, payload.duration);
+          break;
+
+        case "embedded::ui.toast-info":
+          embedded.ui.toast.info(payload.message, payload.duration);
+          break;
+
+        case "embedded::ui.toast-show":
+          embedded.ui.toast.show({
+            type: payload.type,
+            message: payload.message,
+            duration: payload.duration,
+          });
+          break;
 
         case "embedded::ui.modal-open":
-          embedded.ui.openModal(payload.id, payload.content);
+          embedded.ui.modal.open(payload.id, payload.content);
           break;
 
         case "embedded::ui.modal-close":
-          embedded.ui.closeModal(payload.id);
+          embedded.ui.modal.close(payload.id);
           break;
+
+        case "embedded::ui.confirm": {
+          showToast("Waiting for confirm dialog response...", "info");
+          try {
+            const result = await embedded.ui.confirm({
+              title: payload.title,
+              message: payload.message,
+              confirmText: payload.confirmText,
+              cancelText: payload.cancelText,
+              variant: payload.variant,
+            });
+            showToast(
+              `Confirm result: ${result.confirmed ? "✓ Confirmed" : "✗ Cancelled"}`,
+              result.confirmed ? "success" : "info",
+            );
+            logMessage("incoming", {
+              event: "embedded::ui.confirm.response",
+              confirmed: result.confirmed,
+            });
+          } catch (error) {
+            showToast(`Confirm error: ${error.message}`, "error");
+          }
+          break;
+        }
 
         case "embedded::checkout.create":
           embedded.checkout.create(payload.payload);
@@ -682,7 +710,7 @@ import { EmbeddedEvents } from "./events.js";
       }, 500);
     }
 
-    log("Embedded SDK Test Console initialized (v2.0 - New Events)");
+    log("Embedded SDK Test Console initialized");
   }
 
   // Start the app

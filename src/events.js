@@ -310,6 +310,25 @@ const EmbeddedEvents = {
     configurable: ["id"],
   },
 
+  /**
+   * Confirm dialog (async)
+   * Returns a Promise with the user's choice
+   */
+  "embedded::ui.confirm": {
+    category: "ui",
+    description: "Show confirm dialog (async - returns result)",
+    payload: {
+      event: "embedded::ui.confirm",
+      title: "Delete Product?",
+      message: "This action cannot be undone. Are you sure you want to proceed?",
+      confirmText: "Delete",
+      cancelText: "Cancel",
+      variant: "danger",
+    },
+    configurable: ["title", "message", "confirmText", "cancelText", "variant"],
+    async: true,
+  },
+
   // ============================================
   // Checkout Events
   // ============================================
@@ -387,6 +406,16 @@ const IncomingEvents = {
   "embedded::nav.actionClick": {
     description: "Primary action button was clicked by user",
     expectedFields: ["url", "value"],
+  },
+
+  "embedded::ui.confirm.response": {
+    description: "Response to confirm dialog request",
+    expectedFields: ["requestId", "confirmed"],
+  },
+
+  "embedded::ui.modal.response": {
+    description: "Response to modal request",
+    expectedFields: ["requestId", "result", "error"],
   },
 };
 
