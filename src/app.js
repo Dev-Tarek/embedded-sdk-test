@@ -125,7 +125,7 @@ import { EmbeddedEvents } from "./events.js";
       }
 
       log("SDK initialized. Layout: " + JSON.stringify(layout));
-      setConnected(true, "SDK Connected");
+      setConnected(true); // Connected but parent origin will be set when first message received
 
       // Step 2: Get token from URL
       const token = embedded.auth.getToken();
@@ -323,8 +323,13 @@ import { EmbeddedEvents } from "./events.js";
       '<span class="status-dot"></span>' +
       (connected ? "Connected" : "Waiting for Parent");
 
+    // Always show parent origin - use provided origin or show current window origin as fallback
     if (origin) {
       elements.parentOrigin.textContent = origin;
+    } else if (connected && window.location.origin) {
+      elements.parentOrigin.textContent = window.location.origin + " (self)";
+    } else {
+      elements.parentOrigin.textContent = "—";
     }
   }
 
