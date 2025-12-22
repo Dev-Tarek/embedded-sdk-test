@@ -326,7 +326,8 @@ const EmbeddedEvents = {
     payload: {
       event: "embedded::ui.confirm",
       title: "Delete Product?",
-      message: "This action cannot be undone. Are you sure you want to proceed?",
+      message:
+        "This action cannot be undone. Are you sure you want to proceed?",
       confirmText: "Delete",
       cancelText: "Cancel",
       variant: "danger",
@@ -388,7 +389,12 @@ const EmbeddedEvents = {
 const IncomingEvents = {
   "embedded::context.provide": {
     description: "Layout context data sent after iframe.ready",
-    expectedFields: ["layout.theme", "layout.width", "layout.locale", "layout.currency"],
+    expectedFields: [
+      "layout.theme",
+      "layout.width",
+      "layout.locale",
+      "layout.currency",
+    ],
   },
 
   "embedded::theme.change": {

@@ -33,19 +33,19 @@ All events use the `embedded::` namespace prefix.
 
 #### Iframe Lifecycle
 
-| Event                     | Description                           |
-| ------------------------- | ------------------------------------- |
-| `embedded::iframe.ready`  | Init handshake, request layout info   |
-| `embedded::ready`         | Signal app is fully loaded and ready  |
-| `embedded::iframe.resize` | Request iframe height change          |
+| Event                     | Description                          |
+| ------------------------- | ------------------------------------ |
+| `embedded::iframe.ready`  | Init handshake, request layout info  |
+| `embedded::ready`         | Signal app is fully loaded and ready |
+| `embedded::iframe.resize` | Request iframe height change         |
 
 #### Authentication
 
-| Event                    | Description                                |
-| ------------------------ | ------------------------------------------ |
-| `embedded::auth.logout`  | Navigate to installed apps page            |
-| `embedded::auth.refresh` | Re-render iframe with new token            |
-| `embedded::auth.error`   | Signal auth error (redirect with toast)    |
+| Event                    | Description                             |
+| ------------------------ | --------------------------------------- |
+| `embedded::auth.logout`  | Navigate to installed apps page         |
+| `embedded::auth.refresh` | Re-render iframe with new token         |
+| `embedded::auth.error`   | Signal auth error (redirect with toast) |
 
 #### Page Navigation
 
@@ -96,12 +96,12 @@ All events use the `embedded::` namespace prefix.
 
 When connected, the host provides layout info:
 
-| Field      | Type                  | Description            |
-| ---------- | --------------------- | ---------------------- |
-| `theme`    | `'light' \| 'dark'`   | Current theme          |
-| `width`    | `number`              | Parent container width |
-| `locale`   | `string`              | Current locale code    |
-| `currency` | `string`              | Current currency code  |
+| Field      | Type                | Description            |
+| ---------- | ------------------- | ---------------------- |
+| `theme`    | `'light' \| 'dark'` | Current theme          |
+| `width`    | `number`            | Parent container width |
+| `locale`   | `string`            | Current locale code    |
+| `currency` | `string`            | Current currency code  |
 
 ## Token Verification
 
