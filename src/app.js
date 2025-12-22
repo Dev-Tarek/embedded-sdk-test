@@ -129,7 +129,7 @@ import { EmbeddedEvents } from "./events.js";
       }
 
       log("SDK initialized. Layout: " + JSON.stringify(layout));
-      setConnected(true); // Connected but parent origin will be set when first message received
+      setConnected(true, window.parent?.location?.origin); // Connected but parent origin will be set when first message received
 
       // Step 2: Get token from URL
       const token = embedded.auth.getToken();
