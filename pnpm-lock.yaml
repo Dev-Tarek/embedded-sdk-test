@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@salla.sa/embedded-sdk':
-        specifier: 0.1.0-beta.1
-        version: 0.1.0-beta.1
+        specifier: 0.1.0-beta.2
+        version: 0.1.0-beta.2
     devDependencies:
       prettier:
         specifier: ^3.7.4
@@ -269,8 +269,8 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@salla.sa/embedded-sdk@0.1.0-beta.1':
-    resolution: {integrity: sha512-oLeQffNP4yJHYvwJ5U2VQLXD3T4wpG2mgKckfrj+VPIwoLBAHctI5NTT266Cj4hZq2Bzre5uMlrHaHje5WzuTw==}
+  '@salla.sa/embedded-sdk@0.1.0-beta.2':
+    resolution: {integrity: sha512-xsjtsqtvmjuh08/TL84UO4LHE0NKLTe4UcYS5KWKpiA9QUPLdI2Id4843wwYZqQ8QJ6oIavxioLAd+++k/Qxxg==}
     engines: {node: '>=18'}
 
   '@types/estree@1.0.8':
@@ -480,7 +480,7 @@ snapshots:
   '@rollup/rollup-win32-x64-msvc@4.53.5':
     optional: true
 
-  '@salla.sa/embedded-sdk@0.1.0-beta.1': {}
+  '@salla.sa/embedded-sdk@0.1.0-beta.2': {}
 
   '@types/estree@1.0.8': {}
 
