@@ -5,6 +5,9 @@
 [build.environment]
   NODE_VERSION = "18"
 
-# Netlify Functions configuration
-[functions]
-  directory = "netlify/functions"
+# Proxy API calls to avoid CORS issues
+[[redirects]]
+  from = "/api/exchange-authority/*"
+  to = "https://exchange-authority-service-dev-59.merchants.workers.dev/exchange-authority/:splat"
+  status = 200
+  headers = {Access-Control-Allow-Origin = "*", Access-Control-Allow-Headers = "s-source,Content-Type", Access-Control-Allow-Methods = "POST,OPTIONS"}

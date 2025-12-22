@@ -21,19 +21,12 @@ import { EmbeddedEvents } from "./events.js";
   // Constants
   // ============================================
 
-  // Use Netlify function for Netlify deployments to avoid CORS
+  // Use proxy URL for Netlify deployments to avoid CORS
   const VERIFY_API_URL =
     window.location.hostname.includes("netlify.app") ||
     window.location.hostname.includes("localhost")
-      ? "/.netlify/functions/verify-token"
+      ? "/api/exchange-authority/v1/verify"
       : "https://exchange-authority-service-dev-59.merchants.workers.dev/exchange-authority/v1/verify";
-
-  // Debug logging
-  console.log(
-    "[Embedded SDK Test] Current hostname:",
-    window.location.hostname,
-  );
-  console.log("[Embedded SDK Test] Using API URL:", VERIFY_API_URL);
 
   // ============================================
   // State
