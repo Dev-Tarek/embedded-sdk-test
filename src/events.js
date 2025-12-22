@@ -14,14 +14,25 @@ const EmbeddedEvents = {
   // ============================================
 
   /**
-   * Signal iframe is ready and request merchant context
+   * Signal iframe is ready and request layout context
    */
   "embedded::iframe.ready": {
     category: "iframe",
-    description: "Signal iframe is ready, request merchant context from host",
+    description: "Init handshake - request layout context from host",
     payload: {
       event: "embedded::iframe.ready",
       height: document.body.scrollHeight || 600,
+    },
+  },
+
+  /**
+   * Signal app is fully loaded (removes host loading overlay)
+   */
+  "embedded::ready": {
+    category: "iframe",
+    description: "Signal app is fully loaded and ready",
+    payload: {
+      event: "embedded::ready",
     },
   },
 
@@ -47,13 +58,11 @@ const EmbeddedEvents = {
    */
   "embedded::auth.logout": {
     category: "auth",
-    description: "Request user logout",
+    description: "Navigate to installed apps page",
     payload: {
       event: "embedded::auth.logout",
-      redirectUrl: "/auth/login",
     },
-    configurable: ["redirectUrl"],
-    warning: "This will log out the user!",
+    warning: "This will navigate away from the app!",
   },
 
   /**
@@ -61,24 +70,25 @@ const EmbeddedEvents = {
    */
   "embedded::auth.refresh": {
     category: "auth",
-    description: "Request token refresh (triggers page reload)",
+    description: "Request iframe re-render with new token",
     payload: {
       event: "embedded::auth.refresh",
     },
-    warning: "This will reload the page!",
+    warning: "This will reload the iframe!",
   },
 
   /**
-   * Request token verification
+   * Signal auth error
    */
-  "embedded::auth.verify": {
+  "embedded::auth.error": {
     category: "auth",
-    description: "Request token verification via API",
+    description: "Signal auth error (navigate away with toast)",
     payload: {
-      event: "embedded::auth.verify",
-      token: "",
+      event: "embedded::auth.error",
+      message: "Token verification failed",
     },
-    configurable: ["token"],
+    configurable: ["message"],
+    warning: "This will navigate away from the app!",
   },
 
   // ============================================
@@ -111,6 +121,19 @@ const EmbeddedEvents = {
       url: "https://salla.sa",
     },
     configurable: ["url"],
+  },
+
+  /**
+   * Set page title
+   */
+  "embedded::page.setTitle": {
+    category: "page",
+    description: "Set document title in host",
+    payload: {
+      event: "embedded::page.setTitle",
+      title: "My App - Product Details",
+    },
+    configurable: ["title"],
   },
 
   // ============================================
@@ -178,23 +201,6 @@ const EmbeddedEvents = {
       mode: "full",
     },
     configurable: ["mode"],
-  },
-
-  /**
-   * Set breadcrumb navigation
-   */
-  "embedded::ui.breadcrumb": {
-    category: "ui",
-    description: "Set custom breadcrumb navigation",
-    payload: {
-      event: "embedded::ui.breadcrumb",
-      items: [
-        { label: "Home", path: "/" },
-        { label: "Products", path: "/products" },
-        { label: "Edit Product" },
-      ],
-    },
-    configurable: ["items"],
   },
 
   /**
@@ -354,28 +360,25 @@ const EmbeddedEvents = {
   },
 
   // ============================================
-  // Error Reporting Events
+  // Logging Events
   // ============================================
 
   /**
-   * Report error
+   * Send log message
    */
-  "embedded::error.report": {
-    category: "error",
-    description: "Report an error to the host for logging",
+  "embedded::log": {
+    category: "log",
+    description: "Send log message to host",
     payload: {
-      event: "embedded::error.report",
-      error: {
-        name: "TestError",
-        message: "This is a test error",
-        stack: "Error: This is a test error\n    at TestConsole (test.js:1:1)",
-      },
+      event: "embedded::log",
+      level: "info",
+      message: "Test log message from embedded app",
       context: {
         component: "TestConsole",
-        action: "test-error-reporting",
+        action: "test-logging",
       },
     },
-    configurable: ["error", "context"],
+    configurable: ["level", "message", "context"],
   },
 };
 
@@ -384,23 +387,13 @@ const EmbeddedEvents = {
  */
 const IncomingEvents = {
   "embedded::context.provide": {
-    description: "Merchant context data sent after iframe.ready",
-    expectedFields: [
-      "token",
-      "storeId",
-      "userId",
-      "plan",
-      "isDarkMode",
-      "parentWidth",
-      "baseUrl",
-      "baseApiUrl",
-      "locale",
-    ],
+    description: "Layout context data sent after iframe.ready",
+    expectedFields: ["layout.theme", "layout.width", "layout.locale", "layout.currency"],
   },
 
   "embedded::theme.change": {
     description: "Theme change notification from host",
-    expectedFields: ["dark"],
+    expectedFields: ["theme"],
   },
 
   "embedded::nav.actionClick": {

@@ -38,7 +38,7 @@
             </svg>
           </div>
           <h1 class="header-title">Embedded SDK Test Console</h1>
-          <span class="header-version">v1.0</span>
+          <span class="header-version">v0.1.0-beta.2</span>
         </div>
         <div class="header-right">
           <button id="theme-toggle" class="btn btn-icon" title="Toggle Theme">
@@ -122,8 +122,15 @@
                 class="btn btn-event btn-primary"
                 data-event="embedded::iframe.ready"
               >
+                <span class="btn-label">Init + Verify</span>
+                <span class="btn-hint">Full bootstrap flow</span>
+              </button>
+              <button
+                class="btn btn-event btn-success"
+                data-event="embedded::ready"
+              >
                 <span class="btn-label">Ready</span>
-                <span class="btn-hint">iframe.ready</span>
+                <span class="btn-hint">Signal app ready</span>
               </button>
               <button
                 class="btn btn-event"
@@ -163,12 +170,15 @@
                 class="btn btn-event btn-warning"
                 data-event="embedded::auth.refresh"
               >
-                <span class="btn-label">Refresh Token</span>
+                <span class="btn-label">Refresh</span>
                 <span class="btn-hint">auth.refresh</span>
               </button>
-              <button class="btn btn-event" data-event="embedded::auth.verify">
-                <span class="btn-label">Verify Token</span>
-                <span class="btn-hint">auth.verify</span>
+              <button
+                class="btn btn-event btn-danger"
+                data-event="embedded::auth.error"
+              >
+                <span class="btn-label">Error</span>
+                <span class="btn-hint">auth.error</span>
               </button>
             </div>
           </section>
@@ -204,6 +214,13 @@
                 <span class="btn-label">Redirect</span>
                 <span class="btn-hint">page.redirect</span>
               </button>
+              <button
+                class="btn btn-event"
+                data-event="embedded::page.setTitle"
+              >
+                <span class="btn-label">Set Title</span>
+                <span class="btn-hint">page.setTitle</span>
+              </button>
             </div>
           </section>
 
@@ -237,7 +254,7 @@
                 data-event="embedded::nav.clearAction"
               >
                 <span class="btn-label">Clear Action</span>
-                <span class="btn-hint">nav.setAction (clear)</span>
+                <span class="btn-hint">nav.clearAction</span>
               </button>
             </div>
           </section>
@@ -273,13 +290,6 @@
               >
                 <span class="btn-label">Loading Off</span>
                 <span class="btn-hint">ui.loading (hide)</span>
-              </button>
-              <button
-                class="btn btn-event"
-                data-event="embedded::ui.breadcrumb"
-              >
-                <span class="btn-label">Breadcrumb</span>
-                <span class="btn-hint">ui.breadcrumb</span>
               </button>
               <button
                 class="btn btn-event btn-toggle"
@@ -388,7 +398,7 @@
             </div>
           </section>
 
-          <!-- Checkout Events -->
+          <!-- Checkout & Logging -->
           <section class="event-section">
             <h3 class="section-title">
               <svg
@@ -403,7 +413,7 @@
                 <line x1="3" y1="6" x2="21" y2="6" />
                 <path d="M16 10a4 4 0 0 1-8 0" />
               </svg>
-              Checkout
+              Checkout & Logging
             </h3>
             <div class="button-grid">
               <button
@@ -413,33 +423,12 @@
                 <span class="btn-label">Create Checkout</span>
                 <span class="btn-hint">checkout.create</span>
               </button>
-            </div>
-          </section>
-
-          <!-- Error Reporting -->
-          <section class="event-section">
-            <h3 class="section-title">
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-              >
-                <circle cx="12" cy="12" r="10" />
-                <line x1="12" y1="8" x2="12" y2="12" />
-                <line x1="12" y1="16" x2="12.01" y2="16" />
-              </svg>
-              Error Reporting
-            </h3>
-            <div class="button-grid">
               <button
-                class="btn btn-event btn-danger"
-                data-event="embedded::error.report"
+                class="btn btn-event"
+                data-event="embedded::log"
               >
-                <span class="btn-label">Report Error</span>
-                <span class="btn-hint">error.report</span>
+                <span class="btn-label">Send Log</span>
+                <span class="btn-hint">log</span>
               </button>
             </div>
           </section>
@@ -509,23 +498,65 @@
                   />
                 </svg>
                 <p>No messages yet</p>
-                <span>Click "Ready" to start communication</span>
+                <span>Click "Init + Verify" to start the bootstrap flow</span>
               </div>
             </div>
           </section>
 
-          <!-- Received Data -->
+          <!-- Layout Data -->
           <section class="panel panel-data">
             <div class="panel-header">
               <div>
-                <h2 class="panel-title">Received Data</h2>
+                <h2 class="panel-title">Layout Data</h2>
                 <span class="panel-subtitle"
-                  >Context from host (embedded::context.provide)</span
+                  >From embedded::context.provide</span
                 >
               </div>
             </div>
             <div id="received-data" class="data-container">
               <div class="data-grid">
+                <div class="data-item">
+                  <span class="data-label">Theme</span>
+                  <span id="data-theme" class="data-value">—</span>
+                </div>
+                <div class="data-item">
+                  <span class="data-label">Width</span>
+                  <span id="data-width" class="data-value">—</span>
+                </div>
+                <div class="data-item">
+                  <span class="data-label">Locale</span>
+                  <span id="data-locale" class="data-value">—</span>
+                </div>
+                <div class="data-item">
+                  <span class="data-label">Currency</span>
+                  <span id="data-currency" class="data-value">—</span>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Token & Verification Data -->
+          <section class="panel panel-data">
+            <div class="panel-header">
+              <div>
+                <h2 class="panel-title">Token Verification</h2>
+                <span class="panel-subtitle"
+                  >From URL param & API response</span
+                >
+              </div>
+            </div>
+            <div class="data-container">
+              <div class="data-grid">
+                <div class="data-item data-item-full">
+                  <span class="data-label">Token</span>
+                  <span id="data-token" class="data-value data-value-truncate"
+                    >—</span
+                  >
+                </div>
+                <div class="data-item">
+                  <span class="data-label">Verify Status</span>
+                  <span id="data-verify-status" class="data-value">—</span>
+                </div>
                 <div class="data-item">
                   <span class="data-label">Store ID</span>
                   <span id="data-store-id" class="data-value">—</span>
@@ -535,42 +566,12 @@
                   <span id="data-user-id" class="data-value">—</span>
                 </div>
                 <div class="data-item">
-                  <span class="data-label">Plan</span>
-                  <span id="data-plan" class="data-value">—</span>
+                  <span class="data-label">Owner ID</span>
+                  <span id="data-owner-id" class="data-value">—</span>
                 </div>
                 <div class="data-item">
-                  <span class="data-label">Locale</span>
-                  <span id="data-locale" class="data-value">—</span>
-                </div>
-                <div class="data-item">
-                  <span class="data-label">Dark Mode</span>
-                  <span id="data-dark-mode" class="data-value">—</span>
-                </div>
-                <div class="data-item">
-                  <span class="data-label">Token</span>
-                  <span id="data-token" class="data-value data-value-truncate"
-                    >—</span
-                  >
-                </div>
-                <div class="data-item">
-                  <span class="data-label">Base URL</span>
-                  <span
-                    id="data-base-url"
-                    class="data-value data-value-truncate"
-                    >—</span
-                  >
-                </div>
-                <div class="data-item">
-                  <span class="data-label">Base API URL</span>
-                  <span
-                    id="data-base-api-url"
-                    class="data-value data-value-truncate"
-                    >—</span
-                  >
-                </div>
-                <div class="data-item">
-                  <span class="data-label">Parent Width</span>
-                  <span id="data-parent-width" class="data-value">—</span>
+                  <span class="data-label">Expiry</span>
+                  <span id="data-expiry" class="data-value">—</span>
                 </div>
               </div>
             </div>

@@ -1,9 +1,15 @@
 /**
  * Embedded SDK Test Console - Main Application
+ *
+ * This app demonstrates the embedded SDK flow:
+ * 1. embedded.init() - get layout info
+ * 2. embedded.auth.getToken() - get token from URL
+ * 3. Verify token with backend API
+ * 4. embedded.ready() or embedded.auth.error()
  */
 
 /* eslint-env browser */
-/* global window, document, localStorage, URLSearchParams, navigator, confirm, setTimeout, console */
+/* global window, document, localStorage, URLSearchParams, navigator, confirm, setTimeout, console, fetch */
 
 import { embedded } from "@salla.sa/embedded-sdk";
 import { EmbeddedEvents } from "./events.js";
@@ -12,16 +18,26 @@ import { EmbeddedEvents } from "./events.js";
   "use strict";
 
   // ============================================
+  // Constants
+  // ============================================
+
+  const VERIFY_API_URL =
+    "https://exchange-authority-service-dev-59.merchants.workers.dev/exchange-authority/v1/verify";
+
+  // ============================================
   // State
   // ============================================
 
   const state = {
     isConnected: false,
     parentOrigin: null,
-    merchantData: null,
+    layoutData: null,
+    verifiedData: null,
+    token: null,
     messageLog: [],
     isDarkMode: localStorage.getItem("theme") === "dark",
     filterUnknown: true,
+    isInitialized: false,
   };
 
   // ============================================
@@ -42,15 +58,16 @@ import { EmbeddedEvents } from "./events.js";
     toastContainer: document.getElementById("toast-container"),
 
     // Data display elements
+    dataTheme: document.getElementById("data-theme"),
+    dataWidth: document.getElementById("data-width"),
+    dataLocale: document.getElementById("data-locale"),
+    dataCurrency: document.getElementById("data-currency"),
+    dataToken: document.getElementById("data-token"),
+    dataVerifyStatus: document.getElementById("data-verify-status"),
     dataStoreId: document.getElementById("data-store-id"),
     dataUserId: document.getElementById("data-user-id"),
-    dataPlan: document.getElementById("data-plan"),
-    dataLocale: document.getElementById("data-locale"),
-    dataDarkMode: document.getElementById("data-dark-mode"),
-    dataToken: document.getElementById("data-token"),
-    dataBaseUrl: document.getElementById("data-base-url"),
-    dataBaseApiUrl: document.getElementById("data-base-api-url"),
-    dataParentWidth: document.getElementById("data-parent-width"),
+    dataOwnerId: document.getElementById("data-owner-id"),
+    dataExpiry: document.getElementById("data-expiry"),
   };
 
   // ============================================
@@ -80,9 +97,121 @@ import { EmbeddedEvents } from "./events.js";
   function toggleTheme() {
     state.isDarkMode = !state.isDarkMode;
     applyTheme();
-
-    // Notify parent of theme preference (optional)
     log("Theme changed to: " + (state.isDarkMode ? "dark" : "light"), "info");
+  }
+
+  // ============================================
+  // Bootstrap Flow (New SDK Flow)
+  // ============================================
+
+  async function bootstrap() {
+    log("Starting bootstrap flow...");
+
+    try {
+      // Step 1: Initialize SDK and get layout info
+      showToast("Initializing SDK...", "info");
+      const { layout } = await embedded.init({ debug: true });
+
+      state.layoutData = layout;
+      state.isInitialized = true;
+
+      // Update layout display
+      updateLayoutDisplay(layout);
+
+      // Apply theme from host
+      if (layout.theme) {
+        state.isDarkMode = layout.theme === "dark";
+        applyTheme();
+      }
+
+      log("SDK initialized. Layout: " + JSON.stringify(layout));
+      setConnected(true, "SDK Connected");
+
+      // Step 2: Get token from URL
+      const token = embedded.auth.getToken();
+      state.token = token;
+
+      if (token) {
+        elements.dataToken.textContent = maskToken(token);
+        elements.dataToken.title = "Click to copy";
+        log("Token found in URL");
+      } else {
+        log("No token found in URL", "warn");
+        showToast("No token found in URL. Skipping verification.", "warning");
+        // Signal ready anyway for testing
+        embedded.ready();
+        showToast("App ready (no token verification)", "success");
+        return;
+      }
+
+      // Step 3: Verify token with backend API
+      showToast("Verifying token...", "info");
+      elements.dataVerifyStatus.textContent = "Verifying...";
+      elements.dataVerifyStatus.className = "data-value";
+
+      const verifyResult = await verifyToken(token);
+
+      if (verifyResult.success) {
+        // Step 4a: Token valid - signal ready
+        state.verifiedData = verifyResult.data;
+        displayVerifiedData(verifyResult.data);
+        elements.dataVerifyStatus.textContent = "✓ Verified";
+        elements.dataVerifyStatus.className = "data-value data-value-success";
+
+        embedded.ready();
+        showToast("Token verified! App is ready.", "success");
+        log("Token verified. App ready signal sent.");
+      } else {
+        // Step 4b: Token invalid - signal error
+        elements.dataVerifyStatus.textContent = "✗ Failed";
+        elements.dataVerifyStatus.className = "data-value data-value-error";
+
+        showToast("Token verification failed!", "error");
+        log("Token verification failed", "error");
+
+        // In a real app, we would call embedded.auth.error()
+        // For testing, we don't auto-redirect
+        // embedded.auth.error("Token verification failed");
+      }
+    } catch (err) {
+      log("Bootstrap error: " + err.message, "error");
+      showToast("Bootstrap failed: " + err.message, "error");
+
+      // In a real app, signal error
+      // embedded.auth.error(err.message);
+    }
+  }
+
+  /**
+   * Verify token with Salla API
+   */
+  async function verifyToken(token) {
+    try {
+      const response = await fetch(VERIFY_API_URL, {
+        method: "POST",
+        headers: {
+          "s-source": "app",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          token,
+          iss: "salla-partners",
+          subject: "apps",
+          env: "dev",
+        }),
+      });
+
+      const result = await response.json();
+      logMessage("incoming", {
+        event: "token.verify.response",
+        ...result,
+      });
+
+      return result;
+    } catch (error) {
+      log("Token verification error: " + error.message, "error");
+      return { success: false, error: error.message };
+    }
   }
 
   // ============================================
@@ -102,7 +231,6 @@ import { EmbeddedEvents } from "./events.js";
     }
 
     try {
-      // Send to parent with * origin (in production, use specific origin)
       target.postMessage(eventData, "*");
       logMessage("outgoing", eventData);
       return true;
@@ -126,7 +254,6 @@ import { EmbeddedEvents } from "./events.js";
     if (!event.data || !event.data.event) return;
 
     switch (event.data.event) {
-      // New namespaced events
       case "embedded::context.provide":
         handleContextProvide(event.data);
         break;
@@ -139,90 +266,37 @@ import { EmbeddedEvents } from "./events.js";
         handleNavActionClick(event.data);
         break;
 
-      // Legacy event support (for backwards compatibility during transition)
-      case "iframe.loading":
-        handleLegacyIframeLoading(event.data);
-        break;
-
-      case "salla::theme.change":
-        handleThemeChange(event.data);
-        break;
-
-      case "nav.primary-action.clicked":
-        handleNavActionClick(event.data);
-        break;
-
       default:
         log("Received event: " + event.data.event);
     }
   }
 
   /**
-   * Handle new context.provide event (replaces iframe.loading response)
+   * Handle context.provide event (layout info)
    */
   function handleContextProvide(data) {
-    state.merchantData = data;
+    if (data.layout) {
+      state.layoutData = data.layout;
+      updateLayoutDisplay(data.layout);
 
-    // Update data display with new field names
-    updateDataDisplay({
-      storeId: data.storeId,
-      userId: data.userId,
-      plan: data.plan,
-      locale: data.locale,
-      darkMode: data.isDarkMode,
-      token: data.token,
-      baseUrl: data.baseUrl,
-      baseApiUrl: data.baseApiUrl,
-      parentWidth: data.parentWidth,
-    });
-
-    // Apply theme from parent if specified
-    if (typeof data.isDarkMode === "boolean") {
-      state.isDarkMode = data.isDarkMode;
-      applyTheme();
+      if (data.layout.theme) {
+        state.isDarkMode = data.layout.theme === "dark";
+        applyTheme();
+      }
     }
 
-    showToast("Connected! Received merchant context.", "success");
-  }
-
-  /**
-   * Legacy support for old iframe.loading response
-   */
-  function handleLegacyIframeLoading(data) {
-    state.merchantData = data;
-
-    // Map old field names to new format
-    updateDataDisplay({
-      storeId: data["s-store-id"] || data.storeId,
-      userId: data.userId,
-      plan: data.plan,
-      locale: data.locale,
-      darkMode: data.dark ?? data.isDarkMode,
-      token: data.token,
-      baseUrl: data.baseUrl,
-      baseApiUrl: data.baseApiUrl,
-      parentWidth: data.parentWidth,
-    });
-
-    // Apply theme from parent if specified
-    if (typeof data.dark === "boolean") {
-      state.isDarkMode = data.dark;
-      applyTheme();
-    }
-
-    showToast("Connected! (Legacy response)", "info");
+    showToast("Connected! Received layout context.", "success");
   }
 
   function handleThemeChange(data) {
-    const isDark = data.dark ?? data.isDarkMode;
-    if (typeof isDark === "boolean") {
-      state.isDarkMode = isDark;
+    const theme = data.theme;
+    if (theme) {
+      state.isDarkMode = theme === "dark";
       applyTheme();
-      elements.dataDarkMode.textContent = isDark ? "Enabled" : "Disabled";
-      showToast(
-        "Theme changed by host: " + (isDark ? "Dark" : "Light"),
-        "info",
-      );
+      if (elements.dataTheme) {
+        elements.dataTheme.textContent = theme;
+      }
+      showToast("Theme changed by host: " + theme, "info");
     }
   }
 
@@ -254,30 +328,33 @@ import { EmbeddedEvents } from "./events.js";
     }
   }
 
-  function updateDataDisplay(data) {
-    if (data.storeId) elements.dataStoreId.textContent = data.storeId;
-    if (data.userId) elements.dataUserId.textContent = data.userId;
-    if (data.plan) elements.dataPlan.textContent = data.plan;
-    if (data.locale) elements.dataLocale.textContent = data.locale;
-    if (typeof data.darkMode === "boolean") {
-      elements.dataDarkMode.textContent = data.darkMode
-        ? "Enabled"
-        : "Disabled";
+  function updateLayoutDisplay(layout) {
+    if (elements.dataTheme && layout.theme) {
+      elements.dataTheme.textContent = layout.theme;
     }
-    if (data.token) {
-      elements.dataToken.textContent = maskToken(data.token);
-      elements.dataToken.title = "Click to copy";
+    if (elements.dataWidth && layout.width) {
+      elements.dataWidth.textContent = layout.width + "px";
     }
-    if (data.baseUrl) {
-      elements.dataBaseUrl.textContent = data.baseUrl;
-      elements.dataBaseUrl.title = data.baseUrl;
+    if (elements.dataLocale && layout.locale) {
+      elements.dataLocale.textContent = layout.locale;
     }
-    if (data.baseApiUrl) {
-      elements.dataBaseApiUrl.textContent = data.baseApiUrl;
-      elements.dataBaseApiUrl.title = data.baseApiUrl;
+    if (elements.dataCurrency && layout.currency) {
+      elements.dataCurrency.textContent = layout.currency;
     }
-    if (data.parentWidth) {
-      elements.dataParentWidth.textContent = data.parentWidth + "px";
+  }
+
+  function displayVerifiedData(data) {
+    if (elements.dataStoreId && data.store_id) {
+      elements.dataStoreId.textContent = data.store_id;
+    }
+    if (elements.dataUserId && data.user_id) {
+      elements.dataUserId.textContent = data.user_id;
+    }
+    if (elements.dataOwnerId && data.owner_id) {
+      elements.dataOwnerId.textContent = data.owner_id;
+    }
+    if (elements.dataExpiry && data.exp) {
+      elements.dataExpiry.textContent = data.exp;
     }
   }
 
@@ -305,12 +382,10 @@ import { EmbeddedEvents } from "./events.js";
   }
 
   function renderLogEntry(entry) {
-    // Check if we should filter this entry
     if (state.filterUnknown && entry.event === "unknown") {
       return;
     }
 
-    // Remove empty state if present
     const emptyState = elements.messageLog.querySelector(".log-empty");
     if (emptyState) {
       emptyState.remove();
@@ -332,7 +407,6 @@ import { EmbeddedEvents } from "./events.js";
     const directionIcon = entry.direction === "outgoing" ? "→" : "←";
     const directionClass = entry.direction;
 
-    // Format event name for display (remove embedded:: prefix for brevity)
     const displayEvent = entry.event.replace("embedded::", "");
 
     let dataStr = "";
@@ -352,7 +426,6 @@ import { EmbeddedEvents } from "./events.js";
       <span class="log-data">${escapeHtml(dataStr)}</span>
     `;
 
-    // Make entry clickable to show full data
     div.style.cursor = "pointer";
     div.addEventListener("click", () => {
       elements.payloadEditor.value = JSON.stringify(entry.data, null, 2);
@@ -364,39 +437,33 @@ import { EmbeddedEvents } from "./events.js";
   }
 
   function rerenderLog() {
-    // Clear current display
     elements.messageLog.innerHTML = "";
-
-    // Re-render all entries with current filter
     state.messageLog.forEach((entry) => {
       renderLogEntry(entry);
     });
 
-    // Show empty state if no visible entries
     if (elements.messageLog.children.length === 0) {
-      elements.messageLog.innerHTML = [
-        '<div class="log-empty">',
-        '  <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.3">',
-        '    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>',
-        "  </svg>",
-        "  <p>No messages yet</p>",
-        '  <span>Click "Ready" to start communication</span>',
-        "</div>",
-      ].join("");
+      elements.messageLog.innerHTML = `
+        <div class="log-empty">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.3">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+          </svg>
+          <p>No messages yet</p>
+          <span>Click "Init" to start communication</span>
+        </div>`;
     }
   }
 
   function clearLog() {
     state.messageLog = [];
-    elements.messageLog.innerHTML = [
-      '<div class="log-empty">',
-      '  <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.3">',
-      '    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>',
-      "  </svg>",
-      "  <p>No messages yet</p>",
-      '  <span>Click "Ready" to start communication</span>',
-      "</div>",
-    ].join("");
+    elements.messageLog.innerHTML = `
+      <div class="log-empty">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.3">
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+        </svg>
+        <p>No messages yet</p>
+        <span>Click "Init" to start communication</span>
+      </div>`;
     showToast("Log cleared", "info");
   }
 
@@ -418,20 +485,22 @@ import { EmbeddedEvents } from "./events.js";
   }
 
   // ============================================
-  // Event Handlers
+  // Event Handlers (SDK-based)
   // ============================================
 
   async function sendSdkEvent(eventName, payload) {
-    // Log outgoing payload for visibility
     logMessage("outgoing", payload);
 
     try {
       switch (eventName) {
         case "embedded::iframe.ready":
-          await embedded.init({
-            app_id: "embedded-sdk-test-console",
-            debug: true,
-          });
+          // Use bootstrap flow instead
+          await bootstrap();
+          break;
+
+        case "embedded::ready":
+          embedded.ready();
+          showToast("Ready signal sent!", "success");
           break;
 
         case "embedded::iframe.resize":
@@ -439,15 +508,15 @@ import { EmbeddedEvents } from "./events.js";
           break;
 
         case "embedded::auth.logout":
-          embedded.auth.logout(payload.redirectUrl);
+          embedded.auth.logout();
           break;
 
         case "embedded::auth.refresh":
-          embedded.auth.refreshToken();
+          embedded.auth.refresh();
           break;
 
-        case "embedded::auth.verify":
-          embedded.auth.verifyToken(payload.token);
+        case "embedded::auth.error":
+          embedded.auth.error(payload.message);
           break;
 
         case "embedded::page.navigate":
@@ -459,6 +528,10 @@ import { EmbeddedEvents } from "./events.js";
 
         case "embedded::page.redirect":
           embedded.page.redirect(payload.url);
+          break;
+
+        case "embedded::page.setTitle":
+          embedded.page.setTitle(payload.title);
           break;
 
         case "embedded::nav.setAction":
@@ -480,14 +553,6 @@ import { EmbeddedEvents } from "./events.js";
 
         case "embedded::ui.loading-hide":
           embedded.ui.loading.hide();
-          break;
-
-        case "embedded::ui.breadcrumb":
-          embedded.ui.breadcrumbs.set(payload.items);
-          break;
-
-        case "embedded::ui.breadcrumb-clear":
-          embedded.ui.breadcrumbs.clear();
           break;
 
         case "embedded::ui.overlay-open":
@@ -512,14 +577,6 @@ import { EmbeddedEvents } from "./events.js";
 
         case "embedded::ui.toast-info":
           embedded.ui.toast.info(payload.message, payload.duration);
-          break;
-
-        case "embedded::ui.toast-show":
-          embedded.ui.toast.show({
-            type: payload.type,
-            message: payload.message,
-            duration: payload.duration,
-          });
           break;
 
         case "embedded::ui.modal-open":
@@ -558,11 +615,8 @@ import { EmbeddedEvents } from "./events.js";
           embedded.checkout.create(payload.payload);
           break;
 
-        case "embedded::error.report":
-          embedded.reportError(
-            payload.error?.message || "Test error from console",
-            payload.context,
-          );
+        case "embedded::log":
+          embedded.log(payload.level, payload.message, payload.context);
           break;
 
         default:
@@ -582,25 +636,20 @@ import { EmbeddedEvents } from "./events.js";
       return;
     }
 
-    // Check for warning
     if (eventDef.warning) {
       if (!confirm(eventDef.warning + "\n\nContinue?")) {
         return;
       }
     }
 
-    // Create payload with dynamic values
     let payload = JSON.parse(JSON.stringify(eventDef.payload));
 
-    // Update dynamic values
     if (eventName === "embedded::iframe.ready") {
       payload.height = document.body.scrollHeight || 600;
     }
 
-    // Update editor with current payload
     elements.payloadEditor.value = JSON.stringify(payload, null, 2);
 
-    // Send the message via Embedded SDK
     await sendSdkEvent(eventName, payload);
   }
 
@@ -641,8 +690,15 @@ import { EmbeddedEvents } from "./events.js";
     return div.innerHTML;
   }
 
-  function log(message) {
-    console.log(`[EmbeddedSDK Test] ${message}`);
+  function log(message, level = "info") {
+    const prefix = "[EmbeddedSDK Test]";
+    if (level === "error") {
+      console.error(`${prefix} ${message}`);
+    } else if (level === "warn") {
+      console.warn(`${prefix} ${message}`);
+    } else {
+      console.log(`${prefix} ${message}`);
+    }
   }
 
   // ============================================
@@ -650,10 +706,8 @@ import { EmbeddedEvents } from "./events.js";
   // ============================================
 
   function init() {
-    // Initialize theme
     initTheme();
 
-    // Check if we're in an iframe
     const isInIframe = window.parent !== window;
     const hasOpener = window.opener !== null;
 
@@ -665,11 +719,8 @@ import { EmbeddedEvents } from "./events.js";
     }
 
     // Set up event listeners
-
-    // Theme toggle
     elements.themeToggle.addEventListener("click", toggleTheme);
 
-    // Event buttons
     document.querySelectorAll(".btn-event").forEach((button) => {
       button.addEventListener("click", () => {
         const eventName = button.dataset.event;
@@ -677,36 +728,33 @@ import { EmbeddedEvents } from "./events.js";
       });
     });
 
-    // Log actions
     elements.clearLog.addEventListener("click", clearLog);
     elements.copyLog.addEventListener("click", copyLog);
 
-    // Filter checkbox
     elements.filterUnknown.addEventListener("change", (e) => {
       state.filterUnknown = e.target.checked;
       rerenderLog();
     });
 
-    // Custom payload send
     elements.sendCustom.addEventListener("click", handleSendCustom);
 
-    // Listen for incoming messages
     window.addEventListener("message", handleIncomingMessage);
 
-    // Token click to copy
-    elements.dataToken.addEventListener("click", () => {
-      if (state.merchantData?.token) {
-        navigator.clipboard.writeText(state.merchantData.token).then(() => {
-          showToast("Token copied to clipboard", "success");
-        });
-      }
-    });
+    if (elements.dataToken) {
+      elements.dataToken.addEventListener("click", () => {
+        if (state.token) {
+          navigator.clipboard.writeText(state.token).then(() => {
+            showToast("Token copied to clipboard", "success");
+          });
+        }
+      });
+    }
 
-    // Auto-initialize if in iframe
+    // Auto-bootstrap if in iframe
     if (isInIframe) {
       setTimeout(() => {
-        log("Auto-sending embedded::iframe.ready event...");
-        handleEventButtonClick("embedded::iframe.ready");
+        log("Auto-starting bootstrap flow...");
+        bootstrap();
       }, 500);
     }
 
