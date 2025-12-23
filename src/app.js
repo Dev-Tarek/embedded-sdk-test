@@ -168,6 +168,7 @@ import { EmbeddedEvents } from "./events.js";
 
         showToast("Token verification failed!", "error");
         log("Token verification failed", "error");
+        embedded.auth.error("Token verification failed");
 
         // In a real app, we would call embedded.auth.error()
         // For testing, we don't auto-redirect
@@ -313,12 +314,6 @@ import { EmbeddedEvents } from "./events.js";
 
   function setConnected(connected, origin = null) {
     state.isConnected = connected;
-    if (document.referrer) {
-      state.parentOrigin = new URL(document.referrer).origin;
-    } else {
-      state.parentOrigin = origin;
-    }
-
     elements.connectionStatus.className =
       "status-badge " +
       (connected ? "status-connected" : "status-disconnected");
