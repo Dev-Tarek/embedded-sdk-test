@@ -710,11 +710,6 @@ import { EmbeddedEvents } from "./events.js";
   // ============================================
 
   function init() {
-
-    setTimeout(() => {
-      log("Mocking request to verify token...");
-      verifyToken("mock-token");
-    }, 500);
     initTheme();
 
     const isInIframe = window.parent !== window;
