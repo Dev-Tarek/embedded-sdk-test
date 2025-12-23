@@ -168,6 +168,7 @@ import { EmbeddedEvents } from "./events.js";
 
         showToast("Token verification failed!", "error");
         log("Token verification failed", "error");
+        embedded.ui.toast.error("Verification failed");
         embedded.auth.error("Token verification failed");
 
         // In a real app, we would call embedded.auth.error()
