@@ -21,8 +21,8 @@ import { EmbeddedEvents } from "./events.js";
   // Constants
   // ============================================
 
-  const VERIFY_API_URL =
-    "https://exchange-authority-service-dev-59.merchants.workers.dev/exchange-authority/v1/verify";
+  // Token verification is now handled by Netlify serverless function
+  const VERIFY_FUNCTION_URL = "/.netlify/functions/verify-token";
 
   // ============================================
   // State
@@ -183,14 +183,13 @@ import { EmbeddedEvents } from "./events.js";
   }
 
   /**
-   * Verify token with Salla API
+   * Verify token via Netlify serverless function
    */
   async function verifyToken(token) {
     try {
-      const response = await fetch(VERIFY_API_URL, {
+      const response = await fetch(VERIFY_FUNCTION_URL, {
         method: "POST",
         headers: {
-          "s-source": "app",
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
@@ -711,6 +710,11 @@ import { EmbeddedEvents } from "./events.js";
   // ============================================
 
   function init() {
+
+    setTimeout(() => {
+      log("Mocking request to verify token...");
+      verifyToken("mock-token");
+    }, 500);
     initTheme();
 
     const isInIframe = window.parent !== window;
