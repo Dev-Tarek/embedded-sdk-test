@@ -168,10 +168,12 @@ import { EmbeddedEvents } from "./events.js";
 
         showToast("Token verification failed!", "error");
         log("Token verification failed", "error");
-        embedded.ui.toast.error("Verification failed");
+        setTimeout(() => {
+          embedded.ui.toast.error("Verification failed");
+        }, 500);
         setTimeout(() => {
           embedded.auth.error("Token verification failed");
-        }, 500);
+        }, 1500);
 
         // In a real app, we would call embedded.auth.error()
         // For testing, we don't auto-redirect
