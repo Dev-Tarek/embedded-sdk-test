@@ -125,7 +125,7 @@ import { EmbeddedEvents } from "./events.js";
       }
 
       log("SDK initialized. Layout: " + JSON.stringify(layout));
-      setConnected(true, window.parent?.location?.origin); // Connected but parent origin will be set when first message received
+      setConnected(true);
 
       // Step 2: Get token from URL
       const token = embedded.auth.getToken();
@@ -313,7 +313,11 @@ import { EmbeddedEvents } from "./events.js";
 
   function setConnected(connected, origin = null) {
     state.isConnected = connected;
-    state.parentOrigin = origin;
+    if (document.referrer) {
+      state.parentOrigin = new URL(document.referrer).origin;
+    } else {
+      state.parentOrigin = origin;
+    }
 
     elements.connectionStatus.className =
       "status-badge " +
