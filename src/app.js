@@ -197,11 +197,12 @@ import { EmbeddedEvents } from "./events.js";
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "s-source": 953419245,
         },
         body: JSON.stringify({
           token,
-          iss: "salla-partners",
-          subject: "apps",
+          iss: "merchant-dashboard",
+          subject: "embedded-page",
           env: "dev",
         }),
       });
