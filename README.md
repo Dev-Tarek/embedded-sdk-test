@@ -15,7 +15,7 @@ The test console demonstrates the complete authentication flow:
 2. embedded.auth.getToken() - Get token from URL (?token=XXX)
 3. Verify token with Salla API
 4. embedded.ready() - Signal app is ready (removes host loading)
-   OR embedded.auth.error(msg) - Signal auth failure
+   OR embedded.destroy() - Exit embedded view
 ```
 
 ## Usage
@@ -38,14 +38,13 @@ All events use the `embedded::` namespace prefix.
 | `embedded::iframe.ready`  | Init handshake, request layout info  |
 | `embedded::ready`         | Signal app is fully loaded and ready |
 | `embedded::iframe.resize` | Request iframe height change         |
+| `embedded::destroy`      | Exit embedded view                   |
 
 #### Authentication
 
 | Event                    | Description                             |
 | ------------------------ | --------------------------------------- |
-| `embedded::auth.logout`  | Navigate to installed apps page         |
 | `embedded::auth.refresh` | Re-render iframe with new token         |
-| `embedded::auth.error`   | Signal auth error (redirect with toast) |
 
 #### Page Navigation
 
@@ -165,14 +164,6 @@ Content-Type: application/json
 }
 ```
 
-### `embedded::auth.logout`
-
-```json
-{
-  "event": "embedded::auth.logout"
-}
-```
-
 ### `embedded::auth.refresh`
 
 ```json
@@ -181,12 +172,11 @@ Content-Type: application/json
 }
 ```
 
-### `embedded::auth.error`
+### `embedded::destroy`
 
 ```json
 {
-  "event": "embedded::auth.error",
-  "message": "Token verification failed"
+  "event": "embedded::destroy"
 }
 ```
 

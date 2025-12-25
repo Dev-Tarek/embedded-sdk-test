@@ -54,18 +54,6 @@ const EmbeddedEvents = {
   // ============================================
 
   /**
-   * Request logout
-   */
-  "embedded::auth.logout": {
-    category: "auth",
-    description: "Navigate to installed apps page",
-    payload: {
-      event: "embedded::auth.logout",
-    },
-    warning: "This will navigate away from the app!",
-  },
-
-  /**
    * Request token refresh
    */
   "embedded::auth.refresh": {
@@ -77,17 +65,19 @@ const EmbeddedEvents = {
     warning: "This will reload the iframe!",
   },
 
+  // ============================================
+  // Destroy Event
+  // ============================================
+
   /**
-   * Signal auth error
+   * Exit embedded view
    */
-  "embedded::auth.error": {
-    category: "auth",
-    description: "Signal auth error (navigate away with toast)",
+  "embedded::destroy": {
+    category: "iframe",
+    description: "Exit embedded view and navigate to apps page",
     payload: {
-      event: "embedded::auth.error",
-      message: "Token verification failed",
+      event: "embedded::destroy",
     },
-    configurable: ["message"],
     warning: "This will navigate away from the app!",
   },
 
@@ -149,14 +139,25 @@ const EmbeddedEvents = {
     payload: {
       event: "embedded::nav.setAction",
       title: "Add Product",
-      url: "/products/new",
+      onClick: true,
       value: "create",
+      subTitle: "Create a new product",
+      icon: "sicon-add",
+      disabled: false,
       extendedActions: [
         { title: "Import Products", value: "import" },
         { title: "Bulk Edit", value: "bulk-edit" },
       ],
     },
-    configurable: ["title", "url", "value", "extendedActions"],
+    configurable: [
+      "title",
+      "onClick",
+      "value",
+      "subTitle",
+      "icon",
+      "disabled",
+      "extendedActions",
+    ],
   },
 
   /**

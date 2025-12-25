@@ -139,6 +139,13 @@
                 <span class="btn-label">Resize</span>
                 <span class="btn-hint">iframe.resize</span>
               </button>
+              <button
+                class="btn btn-event btn-danger"
+                data-event="embedded::destroy"
+              >
+                <span class="btn-label">Destroy</span>
+                <span class="btn-hint">destroy</span>
+              </button>
             </div>
           </section>
 
@@ -161,24 +168,10 @@
             <div class="button-grid">
               <button
                 class="btn btn-event btn-warning"
-                data-event="embedded::auth.logout"
-              >
-                <span class="btn-label">Logout</span>
-                <span class="btn-hint">auth.logout</span>
-              </button>
-              <button
-                class="btn btn-event btn-warning"
                 data-event="embedded::auth.refresh"
               >
                 <span class="btn-label">Refresh</span>
                 <span class="btn-hint">auth.refresh</span>
-              </button>
-              <button
-                class="btn btn-event btn-danger"
-                data-event="embedded::auth.error"
-              >
-                <span class="btn-label">Error</span>
-                <span class="btn-hint">auth.error</span>
               </button>
             </div>
           </section>
@@ -377,6 +370,7 @@
               <button
                 class="btn btn-event btn-toggle"
                 data-event="embedded::ui.modal-open"
+                disabled
               >
                 <span class="btn-label">Open Modal</span>
                 <span class="btn-hint">ui.modal (open)</span>
@@ -384,6 +378,7 @@
               <button
                 class="btn btn-event"
                 data-event="embedded::ui.modal-close"
+                disabled
               >
                 <span class="btn-label">Close Modal</span>
                 <span class="btn-hint">ui.modal (close)</span>
@@ -419,6 +414,7 @@
               <button
                 class="btn btn-event btn-accent"
                 data-event="embedded::checkout.create"
+                disabled
               >
                 <span class="btn-label">Create Checkout</span>
                 <span class="btn-hint">checkout.create</span>

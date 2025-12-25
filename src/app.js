@@ -5,7 +5,7 @@
  * 1. embedded.init() - get layout info
  * 2. embedded.auth.getToken() - get token from URL
  * 3. Verify token with backend API
- * 4. embedded.ready() or embedded.auth.error()
+ * 4. embedded.ready() or embedded.destroy()
  */
 
 /* eslint-env browser */
@@ -172,19 +172,19 @@ import { EmbeddedEvents } from "./events.js";
           embedded.ui.toast.error("Verification failed");
         }, 500);
         setTimeout(() => {
-          embedded.auth.error("Token verification failed");
+          embedded.destroy();
         }, 1500);
 
-        // In a real app, we would call embedded.auth.error()
+        // In a real app, we would call embedded.destroy()
         // For testing, we don't auto-redirect
-        // embedded.auth.error("Token verification failed");
+        // embedded.destroy();
       }
     } catch (err) {
       log("Bootstrap error: " + err.message, "error");
       showToast("Bootstrap failed: " + err.message, "error");
 
-      // In a real app, signal error
-      // embedded.auth.error(err.message);
+      // In a real app, exit embedded view
+      // embedded.destroy();
     }
   }
 
@@ -515,16 +515,12 @@ import { EmbeddedEvents } from "./events.js";
           embedded.page.resize(payload.height);
           break;
 
-        case "embedded::auth.logout":
-          embedded.auth.logout();
-          break;
-
         case "embedded::auth.refresh":
           embedded.auth.refresh();
           break;
 
-        case "embedded::auth.error":
-          embedded.auth.error(payload.message);
+        case "embedded::destroy":
+          embedded.destroy();
           break;
 
         case "embedded::page.navigate":
@@ -545,8 +541,17 @@ import { EmbeddedEvents } from "./events.js";
         case "embedded::nav.setAction":
           embedded.nav.setAction({
             title: payload.title,
-            url: payload.url,
+            onClick: payload.onClick
+              ? () => {
+                  // onClick callback - the host will send actionClick event
+                  // which will be handled by onActionClick subscribers
+                  console.log("Action button clicked");
+                }
+              : undefined,
             value: payload.value,
+            subTitle: payload.subTitle,
+            icon: payload.icon,
+            disabled: payload.disabled,
             extendedActions: payload.extendedActions,
           });
           break;
@@ -731,6 +736,10 @@ import { EmbeddedEvents } from "./events.js";
 
     document.querySelectorAll(".btn-event").forEach((button) => {
       button.addEventListener("click", () => {
+        // Skip if button is disabled
+        if (button.disabled) {
+          return;
+        }
         const eventName = button.dataset.event;
         handleEventButtonClick(eventName);
       });

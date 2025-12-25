@@ -534,6 +534,18 @@ pre,
   transform: scale(0.98);
 }
 
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.btn:disabled:hover {
+  background: var(--bg-tertiary);
+  border-color: var(--border-color);
+  transform: none;
+}
+
 .btn-icon {
   width: 36px;
   height: 36px;
