@@ -1,4 +1,4 @@
-# Embedded SDK Test Console v0.1.0-beta.2
+# Embedded SDK Test Console v0.1.0-beta.4
 
 A developer testing tool for the Salla Embedded SDK postMessage communication.
 
@@ -65,7 +65,6 @@ All events use the `embedded::` namespace prefix.
 | Event                  | Description                 |
 | ---------------------- | --------------------------- |
 | `embedded::ui.loading` | Show/hide loading indicator |
-| `embedded::ui.overlay` | Enter/exit overlay mode     |
 | `embedded::ui.toast`   | Show toast notification     |
 | `embedded::ui.modal`   | Open/close modal dialog     |
 | `embedded::ui.confirm` | Show confirm dialog (async) |
@@ -231,15 +230,6 @@ Content-Type: application/json
   "event": "embedded::ui.loading",
   "status": false,
   "mode": "full"
-}
-```
-
-### `embedded::ui.overlay`
-
-```json
-{
-  "event": "embedded::ui.overlay",
-  "action": "open"
 }
 ```
 

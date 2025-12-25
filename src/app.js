@@ -569,14 +569,6 @@ import { EmbeddedEvents } from "./events.js";
           embedded.ui.loading.hide();
           break;
 
-        case "embedded::ui.overlay-open":
-          embedded.ui.overlay.open();
-          break;
-
-        case "embedded::ui.overlay-close":
-          embedded.ui.overlay.close();
-          break;
-
         case "embedded::ui.toast-success":
           embedded.ui.toast.success(payload.message, payload.duration);
           break;

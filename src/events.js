@@ -205,30 +205,6 @@ const EmbeddedEvents = {
   },
 
   /**
-   * Open overlay mode
-   */
-  "embedded::ui.overlay-open": {
-    category: "ui",
-    description: "Enter fullscreen overlay mode",
-    payload: {
-      event: "embedded::ui.overlay",
-      action: "open",
-    },
-  },
-
-  /**
-   * Close overlay mode
-   */
-  "embedded::ui.overlay-close": {
-    category: "ui",
-    description: "Exit overlay mode",
-    payload: {
-      event: "embedded::ui.overlay",
-      action: "close",
-    },
-  },
-
-  /**
    * Show success toast
    */
   "embedded::ui.toast-success": {
