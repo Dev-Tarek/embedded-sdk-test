@@ -39,8 +39,8 @@ exports.handler = async (event, context) => {
       },
       body: JSON.stringify({
         token,
-        iss: iss || "salla-partners",
-        subject: subject || "apps",
+        iss: iss || "merchant-dashboard",
+        subject: subject || "embedded-page",
         env: env || "dev",
       }),
     });
