@@ -34,7 +34,7 @@ exports.handler = async (event, context) => {
     const response = await fetch(atob(VERIFY_API_URL), {
       method: "POST",
       headers: {
-        "s-source": "app",
+        "s-source": "953419245", // APP ID
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
