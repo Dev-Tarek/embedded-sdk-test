@@ -1,0 +1,24 @@
+{
+  "name": "embedded-sdk-test",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "vite",
+    "dev:netlify": "netlify dev",
+    "build": "vite build",
+    "preview": "vite preview",
+    "format": "prettier --write ."
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "netlify-cli": "^23.13.0",
+    "prettier": "^3.7.4",
+    "vite": "5.4.17"
+  },
+  "dependencies": {
+    "@salla.sa/embedded-sdk": "0.1.0-beta.4"
+  }
+}

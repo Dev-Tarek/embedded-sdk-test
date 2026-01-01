@@ -10,12 +10,12 @@
   --bg-secondary: #ffffff;
   --bg-tertiary: #f3f4f6;
   --bg-code: #1e1e2e;
-  
+
   --text-primary: #1a1a2e;
   --text-secondary: #64748b;
   --text-tertiary: #94a3b8;
   --text-inverse: #ffffff;
-  
+
   --accent-primary: #6366f1;
   --accent-primary-hover: #4f46e5;
   --accent-secondary: #06b6d4;
@@ -23,32 +23,34 @@
   --accent-warning: #f59e0b;
   --accent-danger: #ef4444;
   --accent-info: #3b82f6;
-  
+
   --border-color: #e2e8f0;
   --border-color-strong: #cbd5e1;
-  
+
   /* Shadows */
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-  
+  --shadow-md:
+    0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg:
+    0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+
   /* Spacing */
   --space-xs: 4px;
   --space-sm: 8px;
   --space-md: 16px;
   --space-lg: 24px;
   --space-xl: 32px;
-  
+
   /* Border Radius */
   --radius-sm: 6px;
   --radius-md: 8px;
   --radius-lg: 12px;
   --radius-xl: 16px;
-  
+
   /* Typography */
-  --font-sans: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
-  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
-  
+  --font-sans: "Outfit", -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: "JetBrains Mono", "Fira Code", monospace;
+
   /* Transitions */
   --transition-fast: 150ms ease;
   --transition-normal: 250ms ease;
@@ -60,18 +62,18 @@
   --bg-secondary: #1a1a2e;
   --bg-tertiary: #252542;
   --bg-code: #0d0d14;
-  
+
   --text-primary: #f1f5f9;
   --text-secondary: #94a3b8;
   --text-tertiary: #64748b;
   --text-inverse: #1a1a2e;
-  
+
   --accent-primary: #818cf8;
   --accent-primary-hover: #a5b4fc;
-  
+
   --border-color: #2d2d4a;
   --border-color-strong: #3d3d5c;
-  
+
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
   --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
   --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
@@ -81,7 +83,9 @@
    Base Styles
    ============================================ */
 
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
@@ -101,7 +105,9 @@ body {
   min-height: 100vh;
 }
 
-code, pre, .font-mono {
+code,
+pre,
+.font-mono {
   font-family: var(--font-mono);
 }
 
@@ -229,8 +235,13 @@ code, pre, .font-mono {
 }
 
 @keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
 }
 
 /* ============================================
@@ -523,6 +534,18 @@ code, pre, .font-mono {
   transform: scale(0.98);
 }
 
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.btn:disabled:hover {
+  background: var(--bg-tertiary);
+  border-color: var(--border-color);
+  transform: none;
+}
+
 .btn-icon {
   width: 36px;
   height: 36px;
@@ -696,11 +719,11 @@ code, pre, .font-mono {
   .main-content {
     grid-template-columns: 1fr;
   }
-  
+
   .panel-triggers {
     position: static;
   }
-  
+
   .button-grid {
     grid-template-columns: repeat(3, 1fr);
   }
@@ -711,13 +734,12 @@ code, pre, .font-mono {
     flex-wrap: wrap;
     gap: var(--space-md);
   }
-  
+
   .button-grid {
     grid-template-columns: repeat(2, 1fr);
   }
-  
+
   .data-grid {
     grid-template-columns: 1fr;
   }
 }
-

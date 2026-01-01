@@ -1,15 +1,27 @@
-# Embedded SDK Test Console v1.0
+# Embedded SDK Test Console v0.1.0-beta.4
 
 A developer testing tool for the Salla Embedded SDK postMessage communication.
 
 ## Overview
 
-This test console allows you to simulate and debug the communication between an embedded third-party app (iframe) and the Salla Dashboard (host). It sends and receives events using the `postMessage` API with the new `embedded::` namespaced event contract.
+This test console allows you to simulate and debug the communication between an embedded third-party app (iframe) and the Salla Dashboard (host). It sends and receives events using the `@salla.sa/embedded-sdk` package.
+
+## Bootstrap Flow
+
+The test console demonstrates the complete authentication flow:
+
+```
+1. embedded.init() - Initialize SDK and get layout info
+2. embedded.auth.getToken() - Get token from URL (?token=XXX)
+3. Verify token with Salla API
+4. embedded.ready() - Signal app is ready (removes host loading)
+   OR embedded.destroy() - Exit embedded view
+```
 
 ## Usage
 
 1. Open this app inside an iframe within the Salla Dashboard
-2. The console will auto-send `embedded::iframe.ready` to request context
+2. The console will auto-run the bootstrap flow
 3. Use the buttons to trigger various events
 4. Monitor the message log for incoming/outgoing events
 
@@ -20,75 +32,122 @@ All events use the `embedded::` namespace prefix.
 ### Outgoing Events (App → Host)
 
 #### Iframe Lifecycle
-| Event | Description |
-|-------|-------------|
-| `embedded::iframe.ready` | Signal app is ready, request merchant context |
-| `embedded::iframe.resize` | Request iframe height change |
+
+| Event                     | Description                          |
+| ------------------------- | ------------------------------------ |
+| `embedded::iframe.ready`  | Init handshake, request layout info  |
+| `embedded::ready`         | Signal app is fully loaded and ready |
+| `embedded::iframe.resize` | Request iframe height change         |
+| `embedded::destroy`      | Exit embedded view                   |
 
 #### Authentication
-| Event | Description |
-|-------|-------------|
-| `embedded::auth.logout` | Request user logout |
-| `embedded::auth.refresh` | Request token refresh (triggers reload) |
-| `embedded::auth.verify` | Request token verification |
+
+| Event                    | Description                             |
+| ------------------------ | --------------------------------------- |
+| `embedded::auth.refresh` | Re-render iframe with new token         |
 
 #### Page Navigation
-| Event | Description |
-|-------|-------------|
-| `embedded::page.navigate` | SPA navigation within dashboard |
+
+| Event                     | Description                        |
+| ------------------------- | ---------------------------------- |
+| `embedded::page.navigate` | SPA navigation within dashboard    |
 | `embedded::page.redirect` | Full page redirect to external URL |
+| `embedded::page.setTitle` | Set document title in host         |
 
 #### Navigation Bar
-| Event | Description |
-|-------|-------------|
+
+| Event                     | Description                     |
+| ------------------------- | ------------------------------- |
 | `embedded::nav.setAction` | Set/clear primary action button |
 
 #### UI State
-| Event | Description |
-|-------|-------------|
+
+| Event                  | Description                 |
+| ---------------------- | --------------------------- |
 | `embedded::ui.loading` | Show/hide loading indicator |
-| `embedded::ui.breadcrumb` | Set breadcrumb navigation |
-| `embedded::ui.overlay` | Enter/exit overlay mode |
-| `embedded::ui.toast` | Show toast notification |
-| `embedded::ui.modal` | Open/close modal dialog |
+| `embedded::ui.toast`   | Show toast notification     |
+| `embedded::ui.modal`   | Open/close modal dialog     |
+| `embedded::ui.confirm` | Show confirm dialog (async) |
 
 #### Business
-| Event | Description |
-|-------|-------------|
+
+| Event                       | Description               |
+| --------------------------- | ------------------------- |
 | `embedded::checkout.create` | Initiate checkout process |
 
-#### Error
-| Event | Description |
-|-------|-------------|
-| `embedded::error.report` | Report error to host |
+#### Logging
+
+| Event           | Description              |
+| --------------- | ------------------------ |
+| `embedded::log` | Send log message to host |
 
 ### Incoming Events (Host → App)
 
-| Event | Description |
-|-------|-------------|
-| `embedded::context.provide` | Merchant context (token, storeId, etc.) |
-| `embedded::theme.change` | Theme changed notification |
-| `embedded::nav.actionClick` | Primary action button was clicked |
+| Event                           | Description                      |
+| ------------------------------- | -------------------------------- |
+| `embedded::context.provide`     | Layout info (theme, width, etc.) |
+| `embedded::theme.change`        | Theme changed notification       |
+| `embedded::nav.actionClick`     | Primary action button clicked    |
+| `embedded::ui.confirm.response` | Confirm dialog response          |
 
-## Context Data
+## Layout Data
 
-When connected, the host provides:
+When connected, the host provides layout info:
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `token` | `string` | Access token for API calls |
-| `storeId` | `number` | Current store ID |
-| `userId` | `number` | Current user ID |
-| `plan` | `string` | Merchant plan name |
-| `locale` | `string` | Current locale code |
-| `isDarkMode` | `boolean` | Dark mode enabled |
-| `parentWidth` | `number` | Parent container width |
-| `baseUrl` | `string` | Dashboard base URL |
-| `baseApiUrl` | `string` | API base URL |
+| Field      | Type                | Description            |
+| ---------- | ------------------- | ---------------------- |
+| `theme`    | `'light' \| 'dark'` | Current theme          |
+| `width`    | `number`            | Parent container width |
+| `locale`   | `string`            | Current locale code    |
+| `currency` | `string`            | Current currency code  |
+
+## Token Verification
+
+The test console verifies tokens using the Salla API:
+
+**Endpoint:**
+
+```
+POST https://exchange-authority-service-dev-59.merchants.workers.dev/exchange-authority/v1/verify
+```
+
+**Headers:**
+
+```
+s-source: app
+Content-Type: application/json
+```
+
+**Request:**
+
+```json
+{
+  "token": "<token_from_url>",
+  "iss": "salla-partners",
+  "subject": "apps",
+  "env": "dev"
+}
+```
+
+**Response:**
+
+```json
+{
+  "status": 200,
+  "success": true,
+  "data": {
+    "store_id": 123,
+    "user_id": 123,
+    "owner_id": 123,
+    "exp": "2026-12-22T10:27:40Z"
+  }
+}
+```
 
 ## Event Payloads
 
 ### `embedded::iframe.ready`
+
 ```json
 {
   "event": "embedded::iframe.ready",
@@ -96,23 +155,32 @@ When connected, the host provides:
 }
 ```
 
-### `embedded::iframe.resize`
+### `embedded::ready`
+
 ```json
 {
-  "event": "embedded::iframe.resize",
-  "height": 800
+  "event": "embedded::ready"
 }
 ```
 
-### `embedded::auth.logout`
+### `embedded::auth.refresh`
+
 ```json
 {
-  "event": "embedded::auth.logout",
-  "redirectUrl": "/auth/login"
+  "event": "embedded::auth.refresh"
+}
+```
+
+### `embedded::destroy`
+
+```json
+{
+  "event": "embedded::destroy"
 }
 ```
 
 ### `embedded::page.navigate`
+
 ```json
 {
   "event": "embedded::page.navigate",
@@ -123,6 +191,7 @@ When connected, the host provides:
 ```
 
 ### `embedded::page.redirect`
+
 ```json
 {
   "event": "embedded::page.redirect",
@@ -130,7 +199,17 @@ When connected, the host provides:
 }
 ```
 
+### `embedded::page.setTitle`
+
+```json
+{
+  "event": "embedded::page.setTitle",
+  "title": "My App - Product Details"
+}
+```
+
 ### `embedded::nav.setAction`
+
 ```json
 {
   "event": "embedded::nav.setAction",
@@ -145,35 +224,17 @@ When connected, the host provides:
 ```
 
 ### `embedded::ui.loading`
+
 ```json
 {
   "event": "embedded::ui.loading",
-  "status": true,
+  "status": false,
   "mode": "full"
 }
 ```
 
-### `embedded::ui.breadcrumb`
-```json
-{
-  "event": "embedded::ui.breadcrumb",
-  "items": [
-    { "label": "Home", "path": "/" },
-    { "label": "Products", "path": "/products" },
-    { "label": "Edit Product" }
-  ]
-}
-```
-
-### `embedded::ui.overlay`
-```json
-{
-  "event": "embedded::ui.overlay",
-  "action": "open"
-}
-```
-
 ### `embedded::ui.toast`
+
 ```json
 {
   "event": "embedded::ui.toast",
@@ -183,17 +244,21 @@ When connected, the host provides:
 }
 ```
 
-### `embedded::ui.modal`
+### `embedded::ui.confirm`
+
 ```json
 {
-  "event": "embedded::ui.modal",
-  "action": "open",
-  "id": "confirm-dialog",
-  "content": { "title": "Confirm", "body": "Are you sure?" }
+  "event": "embedded::ui.confirm",
+  "title": "Delete Product?",
+  "message": "This action cannot be undone.",
+  "confirmText": "Delete",
+  "cancelText": "Cancel",
+  "variant": "danger"
 }
 ```
 
 ### `embedded::checkout.create`
+
 ```json
 {
   "event": "embedded::checkout.create",
@@ -205,18 +270,15 @@ When connected, the host provides:
 }
 ```
 
-### `embedded::error.report`
+### `embedded::log`
+
 ```json
 {
-  "event": "embedded::error.report",
-  "error": {
-    "name": "Error",
-    "message": "Something went wrong",
-    "stack": "..."
-  },
+  "event": "embedded::log",
+  "level": "info",
+  "message": "Test log message",
   "context": {
-    "component": "ProductList",
-    "action": "fetch"
+    "component": "TestConsole"
   }
 }
 ```
@@ -225,17 +287,27 @@ When connected, the host provides:
 
 - `index.html` - Main HTML structure
 - `styles.css` - Styling with dark/light theme support
-- `events.js` - Event definitions and payloads
-- `app.js` - Application logic
+- `src/events.js` - Event definitions and payloads
+- `src/app.js` - Application logic with bootstrap flow
+- `src/main.js` - Entry point
 
 ## Development
 
-Simply open `index.html` in a browser or serve via HTTP.
+```bash
+# Install dependencies
+pnpm install
 
-For testing with the dashboard, embed this app via iframe:
+# Start dev server
+pnpm dev
+
+# Build for production
+pnpm build
+```
+
+For testing with the dashboard, embed this app via iframe with a token:
 
 ```html
-<iframe src="http://localhost:3000/embedded-sdk-test/"></iframe>
+<iframe src="http://localhost:5173/?token=XXX"></iframe>
 ```
 
 ## License
