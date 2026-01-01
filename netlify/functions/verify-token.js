@@ -20,7 +20,7 @@ exports.handler = async (event, context) => {
   try {
     // Parse request body
     const body = JSON.parse(event.body || "{}");
-    const { token, iss, subject, env } = body;
+    const { token, iss, subject, env, appId } = body;
 
     // Validate required fields
     if (!token) {
@@ -30,11 +30,19 @@ exports.handler = async (event, context) => {
       };
     }
 
+    // Validate app ID
+    if (!appId) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ success: false, error: "App ID is required" }),
+      };
+    }
+
     // Make request to Salla API
     const response = await fetch(atob(VERIFY_API_URL), {
       method: "POST",
       headers: {
-        "s-source": 953419245, // APP ID
+        "s-source": appId, // APP ID (dynamic)
         "Content-Type": "application/json",
       },
       body: JSON.stringify({

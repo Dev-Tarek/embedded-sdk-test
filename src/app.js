@@ -23,6 +23,10 @@ import { EmbeddedEvents } from "./events.js";
 
   // Token verification is now handled by Netlify serverless function
   const VERIFY_FUNCTION_URL = "/.netlify/functions/verify-token";
+  
+  // App ID - can be overridden via URL parameter ?appId=XXX
+  const urlParams = new URLSearchParams(window.location.search);
+  const APP_ID = urlParams.get("appId") || 1888000112;
 
   // ============================================
   // State
@@ -197,10 +201,10 @@ import { EmbeddedEvents } from "./events.js";
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "s-source": 953419245,
         },
         body: JSON.stringify({
           token,
+          appId: APP_ID,
           iss: "merchant-dashboard",
           subject: "embedded-page",
           env: "dev",
