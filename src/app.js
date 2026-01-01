@@ -207,7 +207,7 @@ import { EmbeddedEvents } from "./events.js";
           appId: APP_ID,
           iss: "merchant-dashboard",
           subject: "embedded-page",
-          env: "dev",
+          env: "prod",
         }),
       });
 
