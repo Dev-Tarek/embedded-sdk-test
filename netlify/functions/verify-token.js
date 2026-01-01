@@ -8,7 +8,7 @@
 // Environment-based API URLs (base64 encoded)
 const VERIFY_API_URLS = {
   dev: "aHR0cHM6Ly9leGNoYW5nZS1hdXRob3JpdHktc2VydmljZS1kZXYtNTkubWVyY2hhbnRzLndvcmtlcnMuZGV2L2V4Y2hhbmdlLWF1dGhvcml0eS92MS92ZXJpZnk",
-  prod: "aHR0cHM6Ly9hcGkuc2FsbGEuZGV2Lw==",
+  prod: "aHR0cHM6Ly9hcGkuc2FsbGEuZGV2L2V4Y2hhbmdlLWF1dGhvcml0eS92MS92ZXJpZnk=",
 };
 
 exports.handler = async (event, context) => {
