@@ -65,6 +65,19 @@ const EmbeddedEvents = {
     warning: "This will reload the iframe!",
   },
 
+  /**
+   * Introspect token (async)
+   * Returns a Promise with token information
+   */
+  "embedded::auth.introspect": {
+    category: "auth",
+    description: "Get token information (async - returns Promise)",
+    payload: {
+      event: "embedded::auth.introspect",
+    },
+    async: true,
+  },
+
   // ============================================
   // Destroy Event
   // ============================================

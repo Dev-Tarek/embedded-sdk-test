@@ -520,6 +520,36 @@ import { EmbeddedEvents } from "./events.js";
           embedded.auth.refresh();
           break;
 
+        case "embedded::auth.introspect": {
+          showToast("Calling auth.introspect()...", "info");
+          try {
+            const result = await embedded.auth.introspect();
+            showToast(
+              `Introspect success! Token ID: ${result.data.id}, User ID: ${result.data.user_id}`,
+              "success",
+            );
+            logMessage("incoming", {
+              event: "embedded::auth.introspect.response",
+              status: result.status,
+              success: result.success,
+              data: result.data,
+            });
+            log(
+              `Introspect response: ${JSON.stringify(result, null, 2)}`,
+              "info",
+            );
+          } catch (error) {
+            showToast(`Introspect error: ${error.message}`, "error");
+            logMessage("incoming", {
+              event: "embedded::auth.introspect.response",
+              success: false,
+              error: error.message,
+            });
+            log("Introspect error: " + error.message, "error");
+          }
+          break;
+        }
+
         case "embedded::destroy":
           embedded.destroy();
           break;
