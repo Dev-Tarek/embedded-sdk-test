@@ -6,11 +6,10 @@
   "main": "index.js",
   "scripts": {
     "sync-types": "node scripts/sync-types.js",
-    "postinstall": "npm run sync-types",
     "dev": "npm run sync-types && vite",
     "dev:netlify": "netlify dev",
     "prebuild": "npm run sync-types",
-    "build": "vite build",
+    "build": "pnpm prebuild && vite build",
     "preview": "vite preview",
     "format": "prettier --write ."
   },
