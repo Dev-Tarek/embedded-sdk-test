@@ -12,7 +12,7 @@ export default function Header() {
           <Code2 size={32} />
         </div>
         <h1 className="header-title">Embedded SDK Test Console</h1>
-        <span className="header-version">v0.1.0-beta.8</span>
+        <span className="header-version">v0.1.0-beta.9</span>
       </div>
       <div className="header-right">
         <Button
