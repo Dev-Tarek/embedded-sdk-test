@@ -16,8 +16,8 @@
   --text-tertiary: #94a3b8;
   --text-inverse: #ffffff;
 
-  --accent-primary: #6366f1;
-  --accent-primary-hover: #4f46e5;
+  --accent-primary: #004956;
+  --accent-primary-hover: #003d47;
   --accent-secondary: #06b6d4;
   --accent-success: #10b981;
   --accent-warning: #f59e0b;
@@ -68,8 +68,8 @@
   --text-tertiary: #64748b;
   --text-inverse: #1a1a2e;
 
-  --accent-primary: #818cf8;
-  --accent-primary-hover: #a5b4fc;
+  --accent-primary: #76E8CD;
+  --accent-primary-hover: #64e0c4;
 
   --border-color: #2d2d4a;
   --border-color-strong: #3d3d5c;
@@ -260,6 +260,43 @@ pre,
 }
 
 /* ============================================
+   Tabs
+   ============================================ */
+
+.tabs-container {
+  padding: var(--space-sm) var(--space-lg);
+  border-bottom: 1px solid var(--border-color);
+  background: var(--bg-secondary);
+}
+
+.tabs-list {
+  display: flex;
+  gap: var(--space-sm);
+}
+
+.tab-button {
+  padding: var(--space-sm) var(--space-md);
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--text-secondary);
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.tab-button:hover {
+  color: var(--text-primary);
+}
+
+.tab-button.active {
+  color: var(--accent-primary);
+  border-bottom-color: var(--accent-primary);
+}
+
+/* ============================================
    Panels
    ============================================ */
 
@@ -438,6 +475,87 @@ pre,
   word-break: break-all;
 }
 
+/* ============================================
+   Console Output (Playground)
+   ============================================ */
+
+.console-output {
+  background: var(--bg-code);
+}
+
+.console-entry {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-xs) var(--space-sm);
+  margin-bottom: 2px;
+  border-radius: 0;
+  background: rgba(255, 255, 255, 0.02);
+  transition: background var(--transition-fast);
+  line-height: 1.4;
+}
+
+.console-entry:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.console-type {
+  font-weight: 600;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-family: var(--font-sans);
+  flex-shrink: 0;
+  min-width: 50px;
+}
+
+.console-data {
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  white-space: pre-wrap;
+  word-break: break-word;
+  margin: 0;
+  line-height: 1.4;
+  flex: 1;
+  min-width: 0;
+}
+
+.console-log .console-data {
+  color: #a6e3a1; /* Green for logs */
+}
+
+.console-error .console-data {
+  color: #f38ba8; /* Red for errors */
+}
+
+.console-warn .console-data {
+  color: #f9e2af; /* Yellow for warnings */
+}
+
+.console-info .console-data {
+  color: #89b4fa; /* Blue for info */
+}
+
+.console-result .console-data {
+  color: #a6e3a1; /* Green for results */
+  font-weight: 500;
+}
+
+.console-executing {
+  opacity: 0.7;
+  font-style: italic;
+}
+
+.console-executing .console-type {
+  color: var(--accent-primary);
+}
+
+.console-executing .console-data {
+  color: var(--text-tertiary);
+}
+
 /* Data Panel */
 .data-container {
   padding: var(--space-md);
@@ -453,6 +571,10 @@ pre,
   display: flex;
   flex-direction: column;
   gap: 4px;
+}
+
+.data-item-full {
+  grid-column: 1 / -1;
 }
 
 .data-label {
@@ -473,10 +595,24 @@ pre,
   border: 1px solid var(--border-color);
 }
 
+.data-value-success {
+  color: var(--accent-success);
+  border-color: var(--accent-success);
+}
+
+.data-value-error {
+  color: var(--accent-danger);
+  border-color: var(--accent-danger);
+}
+
 .data-value-truncate {
   overflow: hidden;
   text-overflow: ellipsis;
   /* white-space: nowrap; */
+}
+
+.cursor-pointer {
+  cursor: pointer;
 }
 
 /* Editor Panel */
@@ -501,7 +637,11 @@ pre,
 .payload-textarea:focus {
   outline: none;
   border-color: var(--accent-primary);
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+  box-shadow: 0 0 0 3px rgba(0, 73, 86, 0.15);
+}
+
+[data-theme="dark"] .payload-textarea:focus {
+  box-shadow: 0 0 0 3px rgba(118, 232, 205, 0.15);
 }
 
 /* ============================================
@@ -569,6 +709,10 @@ pre,
   border-color: var(--accent-primary-hover);
 }
 
+[data-theme="dark"] .btn-primary {
+  color: var(--text-inverse);
+}
+
 /* Event Buttons */
 .btn-event {
   flex-direction: column;
@@ -627,6 +771,10 @@ pre,
   font-weight: 500;
 }
 
+[data-theme="dark"] .header-version {
+  color: var(--text-inverse);
+}
+
 /* Theme Toggle */
 #theme-toggle .icon-moon {
   display: none;
@@ -638,6 +786,11 @@ pre,
 
 [data-theme="dark"] #theme-toggle .icon-moon {
   display: block;
+}
+
+/* Lucide Icons - Ensure they inherit currentColor */
+.lucide {
+  color: currentColor;
 }
 
 /* ============================================
@@ -672,6 +825,10 @@ pre,
 
 .toast-error {
   border-left: 3px solid var(--accent-danger);
+}
+
+.toast-warning {
+  border-left: 3px solid var(--accent-warning);
 }
 
 .toast-info {
@@ -743,3 +900,4 @@ pre,
     grid-template-columns: 1fr;
   }
 }
+

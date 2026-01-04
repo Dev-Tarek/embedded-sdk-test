@@ -5,8 +5,11 @@
  * to the Salla exchange authority service.
  */
 
-const VERIFY_API_URL =
-  "aHR0cHM6Ly9leGNoYW5nZS1hdXRob3JpdHktc2VydmljZS1kZXYtNTkubWVyY2hhbnRzLndvcmtlcnMuZGV2L2V4Y2hhbmdlLWF1dGhvcml0eS92MS92ZXJpZnk";
+// Environment-based API URLs (base64 encoded)
+const VERIFY_API_URLS = {
+  dev: "aHR0cHM6Ly9leGNoYW5nZS1hdXRob3JpdHktc2VydmljZS1kZXYtNTkubWVyY2hhbnRzLndvcmtlcnMuZGV2L2V4Y2hhbmdlLWF1dGhvcml0eS92MS92ZXJpZnk",
+  prod: "aHR0cHM6Ly9hcGkuc2FsbGEuZGV2L2V4Y2hhbmdlLWF1dGhvcml0eS92MS92ZXJpZnk=",
+};
 
 exports.handler = async (event, context) => {
   // Only allow POST requests
@@ -20,7 +23,7 @@ exports.handler = async (event, context) => {
   try {
     // Parse request body
     const body = JSON.parse(event.body || "{}");
-    const { token, iss, subject, env } = body;
+    const { token, iss, subject, env, appId } = body;
 
     // Validate required fields
     if (!token) {
@@ -30,11 +33,34 @@ exports.handler = async (event, context) => {
       };
     }
 
+    // Validate app ID
+    if (!appId) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ success: false, error: "App ID is required" }),
+      };
+    }
+
+    // Determine environment (default to 'dev')
+    const environment = env || "dev";
+    
+    // Get API URL based on environment
+    const apiUrl = VERIFY_API_URLS[environment];
+    if (!apiUrl) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ 
+          success: false, 
+          error: `Invalid environment: ${environment}. Must be 'dev' or 'prod'` 
+        }),
+      };
+    }
+
     // Make request to Salla API
-    const response = await fetch(atob(VERIFY_API_URL), {
+    const response = await fetch(atob(apiUrl), {
       method: "POST",
       headers: {
-        "s-source": 953419245, // APP ID
+        "s-source": appId, // APP ID (dynamic)
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
