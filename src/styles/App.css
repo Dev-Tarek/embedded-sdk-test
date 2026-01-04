@@ -466,13 +466,25 @@ pre,
 }
 
 .log-event {
-  color: var(--accent-primary);
+  color: var(--accent-success);
   font-weight: 500;
 }
 
 .log-data {
   color: var(--text-secondary);
   word-break: break-all;
+}
+
+/* ============================================
+   Playground Container
+   ============================================ */
+
+.playground-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-lg);
+  width: 100%;
+  grid-column: 1 / -1;
 }
 
 /* ============================================
@@ -883,6 +895,10 @@ pre,
 
   .button-grid {
     grid-template-columns: repeat(3, 1fr);
+  }
+
+  .playground-container {
+    grid-template-columns: 1fr;
   }
 }
 

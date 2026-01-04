@@ -7,7 +7,10 @@ export function useEmbeddedSDK() {
 
   // Expose embedded globally for playground
   useEffect(() => {
-    window.embedded = embedded;
+    if (!window.salla) {
+      window.salla = {};
+    }
+    window.salla.embedded = embedded;
   }, []);
 
   const init = useCallback(async (options = { debug: true }) => {
