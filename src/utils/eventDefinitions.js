@@ -18,7 +18,10 @@ const EmbeddedEvents = {
     description: "Init handshake - request layout context from host",
     payload: {
       event: "embedded::iframe.ready",
-      height: typeof document !== "undefined" ? document.body.scrollHeight || 600 : 600,
+      height:
+        typeof document !== "undefined"
+          ? document.body.scrollHeight || 600
+          : 600,
     },
   },
 
@@ -407,4 +410,3 @@ const IncomingEvents = {
 
 // Export for ESM consumers
 export { EmbeddedEvents, IncomingEvents };
-

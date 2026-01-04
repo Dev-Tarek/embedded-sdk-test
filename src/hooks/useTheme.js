@@ -17,7 +17,10 @@ export function useTheme() {
   }, [isDarkMode]);
 
   const applyTheme = (dark) => {
-    document.documentElement.setAttribute("data-theme", dark ? "dark" : "light");
+    document.documentElement.setAttribute(
+      "data-theme",
+      dark ? "dark" : "light"
+    );
     localStorage.setItem("theme", dark ? "dark" : "light");
   };
 
@@ -27,4 +30,3 @@ export function useTheme() {
 
   return { isDarkMode, toggleTheme };
 }
-

@@ -1,0 +1,27 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Build outputs
+dist/
+build/
+*.min.js
+*.min.css
+
+# Lock files
+pnpm-lock.yaml
+package-lock.json
+yarn.lock
+
+# Generated files
+public/types/*.d.ts
+
+# Config files that shouldn't be formatted
+netlify.toml
+vite.config.js
+.codacy/
+
+# Other
+.DS_Store
+*.log
+

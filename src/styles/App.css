@@ -68,7 +68,7 @@
   --text-tertiary: #64748b;
   --text-inverse: #1a1a2e;
 
-  --accent-primary: #76E8CD;
+  --accent-primary: #76e8cd;
   --accent-primary-hover: #64e0c4;
 
   --border-color: #2d2d4a;
@@ -916,4 +916,3 @@ pre,
     grid-template-columns: 1fr;
   }
 }
-

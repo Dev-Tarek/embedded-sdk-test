@@ -4,7 +4,8 @@ import Button from "./forms/Button.jsx";
 
 export default function PayloadEditor({ onSend, initialPayload = "" }) {
   const [payload, setPayload] = useState(
-    initialPayload || JSON.stringify({ event: "embedded::iframe.ready", height: 600 }, null, 2)
+    initialPayload ||
+      JSON.stringify({ event: "embedded::iframe.ready", height: 600 }, null, 2)
   );
 
   const handleSend = () => {
@@ -41,4 +42,3 @@ export default function PayloadEditor({ onSend, initialPayload = "" }) {
     </section>
   );
 }
-

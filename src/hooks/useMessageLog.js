@@ -1,21 +1,25 @@
 import { useState, useCallback } from "react";
+import logger from "../utils/logger.js";
 
 export function useMessageLog() {
   const [messageLog, setMessageLog] = useState([]);
   const [filterUnknown, setFilterUnknown] = useState(true);
 
-  const logMessage = useCallback((direction, data, error = null, origin = null) => {
-    const entry = {
-      time: new Date().toISOString(),
-      direction,
-      event: data?.event || "unknown",
-      data,
-      error,
-      origin,
-    };
+  const logMessage = useCallback(
+    (direction, data, error = null, origin = null) => {
+      const entry = {
+        time: new Date().toISOString(),
+        direction,
+        event: data?.event || "unknown",
+        data,
+        error,
+        origin,
+      };
 
-    setMessageLog((prev) => [...prev, entry]);
-  }, []);
+      setMessageLog((prev) => [...prev, entry]);
+    },
+    []
+  );
 
   const clearLog = useCallback(() => {
     setMessageLog([]);
@@ -32,7 +36,7 @@ export function useMessageLog() {
       await navigator.clipboard.writeText(logText);
       return true;
     } catch (error) {
-      console.error("Failed to copy log:", error);
+      logger.error("Failed to copy log:", error);
       return false;
     }
   }, [messageLog]);
@@ -46,4 +50,3 @@ export function useMessageLog() {
     copyLog,
   };
 }
-

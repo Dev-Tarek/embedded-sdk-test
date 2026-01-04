@@ -9,7 +9,13 @@ function escapeHtml(text) {
   return div.innerHTML;
 }
 
-export default function MessageLog({ messageLog, filterUnknown, onFilterChange, onClear, onCopy }) {
+export default function MessageLog({
+  messageLog,
+  filterUnknown,
+  onFilterChange,
+  onClear,
+  onCopy,
+}) {
   const logContainerRef = useRef(null);
 
   useEffect(() => {
@@ -48,9 +54,15 @@ export default function MessageLog({ messageLog, filterUnknown, onFilterChange, 
     }
 
     return (
-      <div key={entry.time + Math.random()} className="log-entry" data-event={entry.event}>
+      <div
+        key={entry.time + Math.random()}
+        className="log-entry"
+        data-event={entry.event}
+      >
         <span className="log-time">{timeStr}</span>
-        <span className={`log-direction ${directionClass}`}>{directionIcon}</span>
+        <span className={`log-direction ${directionClass}`}>
+          {directionIcon}
+        </span>
         <span className="log-event">{escapeHtml(displayEvent)}</span>
         <span className="log-data">{escapeHtml(dataStr)}</span>
       </div>
@@ -83,7 +95,11 @@ export default function MessageLog({ messageLog, filterUnknown, onFilterChange, 
       <div ref={logContainerRef} className="log-container">
         {filteredLog.length === 0 ? (
           <div className="log-empty">
-            <MessageSquare size={48} strokeWidth={1.5} style={{ opacity: 0.3 }} />
+            <MessageSquare
+              size={48}
+              strokeWidth={1.5}
+              style={{ opacity: 0.3 }}
+            />
             <p>No messages yet</p>
             <span>Click "Init + Verify" to start the bootstrap flow</span>
           </div>
@@ -94,4 +110,3 @@ export default function MessageLog({ messageLog, filterUnknown, onFilterChange, 
     </section>
   );
 }
-

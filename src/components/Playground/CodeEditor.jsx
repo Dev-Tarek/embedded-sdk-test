@@ -1,5 +1,6 @@
 import { useTheme } from "../../hooks/useTheme.js";
 import Editor from "@monaco-editor/react";
+import logger from "../../utils/logger.js";
 
 const onMount = async (editor, monaco) => {
   let sdkTypesLoaded = false;
@@ -24,7 +25,7 @@ const onMount = async (editor, monaco) => {
       sdkTypesLoaded = true;
     }
   } catch (e) {
-    console.warn("Could not load SDK types, using inline types", e);
+    logger.warn("Could not load SDK types, using inline types", e);
   }
 };
 

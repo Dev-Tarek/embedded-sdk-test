@@ -23,6 +23,8 @@ function getLogTypeColor(type) {
       return "var(--accent-warning)";
     case "info":
       return "var(--accent-primary)";
+    case "debug":
+      return "var(--text-secondary)";
     case "result":
       return "var(--accent-success)";
     default:
@@ -40,6 +42,8 @@ function getLogTypeIcon(type) {
       return "⚠";
     case "info":
       return "ℹ";
+    case "debug":
+      return "🔍";
     case "result":
       return "✓";
     default:
@@ -68,7 +72,11 @@ export default function OutputPanel({ output, isExecuting }) {
       <div className="log-container console-output">
         {output.length === 0 && !isExecuting ? (
           <div className="log-empty">
-            <MessageSquare size={48} strokeWidth={1.5} style={{ opacity: 0.3 }} />
+            <MessageSquare
+              size={48}
+              strokeWidth={1.5}
+              style={{ opacity: 0.3 }}
+            />
             <p>No output yet</p>
             <span>Write code and click "Run" to see results</span>
           </div>

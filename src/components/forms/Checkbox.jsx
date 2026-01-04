@@ -1,5 +1,6 @@
 export default function Checkbox({ checked, onChange, label, id, ...props }) {
-  const checkboxId = id || `checkbox-${Math.random().toString(36).substr(2, 9)}`;
+  const checkboxId =
+    id || `checkbox-${Math.random().toString(36).substr(2, 9)}`;
 
   return (
     <label className="filter-checkbox" htmlFor={checkboxId}>
@@ -14,4 +15,3 @@ export default function Checkbox({ checked, onChange, label, id, ...props }) {
     </label>
   );
 }
-

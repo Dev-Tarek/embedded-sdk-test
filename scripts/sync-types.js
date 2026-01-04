@@ -6,7 +6,13 @@
  * This ensures types are always up-to-date with the installed package version
  */
 
-import { readFileSync, writeFileSync, mkdirSync, existsSync, readdirSync } from "fs";
+import {
+  readFileSync,
+  writeFileSync,
+  mkdirSync,
+  existsSync,
+  readdirSync,
+} from "fs";
 import { join, dirname, resolve } from "path";
 import { fileURLToPath } from "url";
 import { createRequire } from "module";
@@ -22,7 +28,7 @@ const TYPES_DEST = "public/types/salla-embedded-sdk.d.ts";
 try {
   const nodeModulesPath = join(rootDir, "node_modules");
   let packagePath;
-  
+
   // First try pnpm structure (most common)
   const pnpmPath = join(nodeModulesPath, ".pnpm");
   if (existsSync(pnpmPath)) {
@@ -32,7 +38,13 @@ try {
     const candidates = [];
     for (const entry of entries) {
       if (entry.startsWith(packageNameEscaped + "@")) {
-        const candidatePath = join(pnpmPath, entry, "node_modules", SDK_PACKAGE, "package.json");
+        const candidatePath = join(
+          pnpmPath,
+          entry,
+          "node_modules",
+          SDK_PACKAGE,
+          "package.json"
+        );
         if (existsSync(candidatePath)) {
           candidates.push(candidatePath);
         }
@@ -59,7 +71,7 @@ try {
       packagePath = candidates[candidates.length - 1];
     }
   }
-  
+
   // Fallback to standard node_modules structure
   if (!packagePath) {
     packagePath = join(nodeModulesPath, SDK_PACKAGE, "package.json");
@@ -80,29 +92,35 @@ try {
   // Read package.json to find types path
   const packageJson = JSON.parse(readFileSync(packagePath, "utf-8"));
   const packageDir = dirname(packagePath);
-  
+
   // Get types path from package.json
   let typesPath = packageJson.types || packageJson.typings;
   if (!typesPath && packageJson.exports && packageJson.exports["."]) {
     typesPath = packageJson.exports["."].types;
   }
-  
+
   if (!typesPath) {
     throw new Error(`No types field found in ${SDK_PACKAGE} package.json`);
   }
 
   // Resolve types file path relative to package directory
   const typesSourcePath = resolve(packageDir, typesPath);
-  
+
   if (!existsSync(typesSourcePath)) {
     // Types file doesn't exist in package - check if we have a cached version
     const destPath = join(rootDir, TYPES_DEST);
     if (existsSync(destPath)) {
-      console.log(`⚠ Types file not found in package, using existing cached version at ${TYPES_DEST}`);
-      console.log(`  If you need to update types, ensure ${SDK_PACKAGE} includes dist/types/index.d.ts`);
+      console.log(
+        `⚠ Types file not found in package, using existing cached version at ${TYPES_DEST}`
+      );
+      console.log(
+        `  If you need to update types, ensure ${SDK_PACKAGE} includes dist/types/index.d.ts`
+      );
       process.exit(0);
     } else {
-      throw new Error(`Types file not found at ${typesSourcePath} and no cached version exists`);
+      throw new Error(
+        `Types file not found at ${typesSourcePath} and no cached version exists`
+      );
     }
   }
 
@@ -128,4 +146,3 @@ try {
   }
   process.exit(1);
 }
-
