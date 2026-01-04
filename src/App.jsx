@@ -61,10 +61,6 @@ function AppContent() {
       // Log all incoming messages
       logMessage("incoming", event.data, null, event.origin);
 
-      if (event.origin && event.origin !== window.location.origin) {
-        setParentOrigin(event.origin);
-      }
-
       // Update connection status on first message
       if (!isConnected && event.data && event.data.event) {
         setIsConnected(true);
@@ -75,6 +71,10 @@ function AppContent() {
 
       switch (event.data.event) {
         case "embedded::context.provide":
+          // Set parent origin only from the official SDK handshake message
+          if (event.origin && event.origin !== window.location.origin) {
+            setParentOrigin(event.origin);
+          }
           if (event.data.layout) {
             handleLayoutUpdate(event.data.layout);
             showToast("Connected! Received layout context.", "success");
