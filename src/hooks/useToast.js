@@ -27,4 +27,3 @@ export function useToast() {
     removeToast,
   };
 }
-

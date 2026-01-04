@@ -1,5 +1,7 @@
+/* global window */
 import { useState, useEffect, useCallback } from "react";
 import { embedded } from "@salla.sa/embedded-sdk";
+import logger from "../utils/logger.js";
 
 export function useEmbeddedSDK() {
   const [isInitialized, setIsInitialized] = useState(false);
@@ -20,7 +22,7 @@ export function useEmbeddedSDK() {
       setIsInitialized(true);
       return { layout };
     } catch (error) {
-      console.error("SDK initialization error:", error);
+      logger.error("SDK initialization error:", error);
       throw error;
     }
   }, []);
@@ -33,4 +35,3 @@ export function useEmbeddedSDK() {
     init,
   };
 }
-

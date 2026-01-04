@@ -11,7 +11,8 @@
     "dev:netlify": "netlify dev",
     "build": "pnpm prebuild && vite build",
     "preview": "vite preview",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
   },
   "keywords": [],
   "author": "",
@@ -24,7 +25,7 @@
   },
   "dependencies": {
     "@monaco-editor/react": "^4.7.0",
-    "@salla.sa/embedded-sdk": "0.1.0-beta.8",
+    "@salla.sa/embedded-sdk": "0.1.0-beta.9",
     "lucide-react": "^0.562.0",
     "monaco-editor": "^0.55.1",
     "react": "^19.2.3",

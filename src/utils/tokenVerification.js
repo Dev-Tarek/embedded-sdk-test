@@ -1,4 +1,5 @@
 import { VERIFY_FUNCTION_URL, getAppId } from "./constants.js";
+import logger from "./logger.js";
 
 /**
  * Verify token via Netlify serverless function
@@ -22,8 +23,7 @@ export async function verifyToken(token) {
     const result = await response.json();
     return result;
   } catch (error) {
-    console.error("Token verification error:", error);
+    logger.error("Token verification error:", error);
     return { success: false, error: error.message };
   }
 }
-

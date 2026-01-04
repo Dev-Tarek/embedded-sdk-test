@@ -1,4 +1,4 @@
-# Embedded SDK Test Console v0.1.0-8
+# Embedded SDK Test Console v0.1.0-beta.9
 
 A developer testing tool for the Salla Embedded SDK postMessage communication.
 
@@ -38,13 +38,13 @@ All events use the `embedded::` namespace prefix.
 | `embedded::iframe.ready`  | Init handshake, request layout info  |
 | `embedded::ready`         | Signal app is fully loaded and ready |
 | `embedded::iframe.resize` | Request iframe height change         |
-| `embedded::destroy`      | Exit embedded view                   |
+| `embedded::destroy`       | Exit embedded view                   |
 
 #### Authentication
 
-| Event                    | Description                             |
-| ------------------------ | --------------------------------------- |
-| `embedded::auth.refresh` | Re-render iframe with new token         |
+| Event                    | Description                     |
+| ------------------------ | ------------------------------- |
+| `embedded::auth.refresh` | Re-render iframe with new token |
 
 #### Page Navigation
 

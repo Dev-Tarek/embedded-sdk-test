@@ -150,7 +150,10 @@ function AppContent() {
       const target = window.parent !== window ? window.parent : window.opener;
 
       if (!target || target === window) {
-        showToast("No parent window detected. Open this page in an iframe.", "error");
+        showToast(
+          "No parent window detected. Open this page in an iframe.",
+          "error"
+        );
         logMessage("outgoing", payload, "No parent window");
         return;
       }
@@ -217,7 +220,11 @@ function AppContent() {
             </div>
           </>
         ) : (
-          <PlaygroundTab embedded={embedded} logMessage={logMessage} showToast={showToast} />
+          <PlaygroundTab
+            embedded={embedded}
+            logMessage={logMessage}
+            showToast={showToast}
+          />
         )}
       </main>
     </div>

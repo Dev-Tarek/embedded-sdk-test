@@ -1,8 +1,24 @@
 import { EmbeddedEvents } from "../utils/eventDefinitions.js";
-import { Clock, Lock, Home, Menu, Grid3x3, Bell, Square, ShoppingBag } from "lucide-react";
+import {
+  Clock,
+  Lock,
+  Home,
+  Menu,
+  Grid3x3,
+  Bell,
+  Square,
+  ShoppingBag,
+} from "lucide-react";
 import Button from "./forms/Button.jsx";
+import logger from "../utils/logger.js";
 
-export default function EventTriggers({ onEventClick, embedded, logMessage, showToast, bootstrap }) {
+export default function EventTriggers({
+  onEventClick,
+  embedded,
+  logMessage,
+  showToast,
+  bootstrap,
+}) {
   const handleEventButtonClick = async (eventName) => {
     const eventDef = EmbeddedEvents[eventName];
 
@@ -97,7 +113,7 @@ export default function EventTriggers({ onEventClick, embedded, logMessage, show
             title: payload.title,
             onClick: payload.onClick
               ? () => {
-                  console.log("Action button clicked");
+                  logger.log("Action button clicked");
                 }
               : undefined,
             value: payload.value,
@@ -189,7 +205,9 @@ export default function EventTriggers({ onEventClick, embedded, logMessage, show
     <aside className="panel panel-triggers">
       <div className="panel-header">
         <h2 className="panel-title">Event Triggers</h2>
-        <span className="panel-subtitle">Send events to host (embedded::*)</span>
+        <span className="panel-subtitle">
+          Send events to host (embedded::*)
+        </span>
       </div>
 
       {/* Iframe Lifecycle Events */}
@@ -421,4 +439,3 @@ export default function EventTriggers({ onEventClick, embedded, logMessage, show
     </aside>
   );
 }
-

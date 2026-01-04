@@ -6,4 +6,3 @@ export function getAppId() {
   const urlParams = new URLSearchParams(window.location.search);
   return urlParams.get("appId") || 1888000112;
 }
-

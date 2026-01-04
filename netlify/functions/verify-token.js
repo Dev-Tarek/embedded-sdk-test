@@ -1,6 +1,6 @@
 /**
  * Netlify Serverless Function - Token Verification
- * 
+ *
  * This function handles token verification by proxying the request
  * to the Salla exchange authority service.
  */
@@ -43,15 +43,15 @@ exports.handler = async (event, context) => {
 
     // Determine environment (default to 'dev')
     const environment = env || "dev";
-    
+
     // Get API URL based on environment
     const apiUrl = VERIFY_API_URLS[environment];
     if (!apiUrl) {
       return {
         statusCode: 400,
-        body: JSON.stringify({ 
-          success: false, 
-          error: `Invalid environment: ${environment}. Must be 'dev' or 'prod'` 
+        body: JSON.stringify({
+          success: false,
+          error: `Invalid environment: ${environment}. Must be 'dev' or 'prod'`,
         }),
       };
     }
@@ -94,4 +94,3 @@ exports.handler = async (event, context) => {
     };
   }
 };
-

@@ -1,16 +1,23 @@
+import logger from "../utils/logger.js";
+
 function maskToken(token) {
   if (!token || token.length < 20) return token;
   return token.substring(0, 10) + "..." + token.substring(token.length - 10);
 }
 
-export default function DataDisplay({ layoutData, token, verifiedData, verifyStatus }) {
+export default function DataDisplay({
+  layoutData,
+  token,
+  verifiedData,
+  verifyStatus,
+}) {
   const handleTokenClick = async () => {
     if (token) {
       try {
         await navigator.clipboard.writeText(token);
         // Could show a toast here
       } catch (error) {
-        console.error("Failed to copy token:", error);
+        logger.error("Failed to copy token:", error);
       }
     }
   };
@@ -22,7 +29,9 @@ export default function DataDisplay({ layoutData, token, verifiedData, verifySta
         <div className="panel-header">
           <div>
             <h2 className="panel-title">Layout Data</h2>
-            <span className="panel-subtitle">From embedded::context.provide</span>
+            <span className="panel-subtitle">
+              From embedded::context.provide
+            </span>
           </div>
         </div>
         <div className="data-container">
@@ -54,7 +63,9 @@ export default function DataDisplay({ layoutData, token, verifiedData, verifySta
         <div className="panel-header">
           <div>
             <h2 className="panel-title">Token Verification</h2>
-            <span className="panel-subtitle">From URL param & API response</span>
+            <span className="panel-subtitle">
+              From URL param & API response
+            </span>
           </div>
         </div>
         <div className="data-container">
@@ -76,8 +87,8 @@ export default function DataDisplay({ layoutData, token, verifiedData, verifySta
                   verifyStatus === "✓ Verified"
                     ? "data-value-success"
                     : verifyStatus === "✗ Failed"
-                    ? "data-value-error"
-                    : ""
+                      ? "data-value-error"
+                      : ""
                 }`}
               >
                 {verifyStatus}
@@ -85,7 +96,9 @@ export default function DataDisplay({ layoutData, token, verifiedData, verifySta
             </div>
             <div className="data-item">
               <span className="data-label">Store ID</span>
-              <span className="data-value">{verifiedData?.store_id || "—"}</span>
+              <span className="data-value">
+                {verifiedData?.store_id || "—"}
+              </span>
             </div>
             <div className="data-item">
               <span className="data-label">User ID</span>
@@ -93,7 +106,9 @@ export default function DataDisplay({ layoutData, token, verifiedData, verifySta
             </div>
             <div className="data-item">
               <span className="data-label">Owner ID</span>
-              <span className="data-value">{verifiedData?.owner_id || "—"}</span>
+              <span className="data-value">
+                {verifiedData?.owner_id || "—"}
+              </span>
             </div>
             <div className="data-item">
               <span className="data-label">Expiry</span>
@@ -105,4 +120,3 @@ export default function DataDisplay({ layoutData, token, verifiedData, verifySta
     </>
   );
 }
-

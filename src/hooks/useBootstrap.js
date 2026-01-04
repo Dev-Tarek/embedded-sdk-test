@@ -1,7 +1,13 @@
 import { useState, useCallback } from "react";
 import { verifyToken } from "../utils/tokenVerification.js";
+import logger from "../utils/logger.js";
 
-export function useBootstrap(embedded, onLayoutUpdate, onVerifiedDataUpdate, showToast) {
+export function useBootstrap(
+  embedded,
+  onLayoutUpdate,
+  onVerifiedDataUpdate,
+  showToast
+) {
   const [token, setToken] = useState(null);
   const [verifiedData, setVerifiedData] = useState(null);
   const [verifyStatus, setVerifyStatus] = useState("—");
@@ -50,7 +56,7 @@ export function useBootstrap(embedded, onLayoutUpdate, onVerifiedDataUpdate, sho
         }, 1500);
       }
     } catch (err) {
-      console.error("Bootstrap error:", err);
+      logger.error("Bootstrap error:", err);
       showToast("Bootstrap failed: " + err.message, "error");
     }
   }, [embedded, onLayoutUpdate, onVerifiedDataUpdate, showToast]);
@@ -62,4 +68,3 @@ export function useBootstrap(embedded, onLayoutUpdate, onVerifiedDataUpdate, sho
     bootstrap,
   };
 }
-

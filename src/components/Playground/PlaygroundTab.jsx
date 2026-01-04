@@ -22,7 +22,6 @@ async function main() {
 main();
 `;
 
-
 export default function PlaygroundTab({ embedded, logMessage, showToast }) {
   const [code, setCode] = useState(DEFAULT_CODE);
   const { output, isExecuting, executeCode, clearOutput } = useCodeExecution();
@@ -41,15 +40,19 @@ export default function PlaygroundTab({ embedded, logMessage, showToast }) {
         <div className="panel-header">
           <div>
             <h2 className="panel-title">Code Editor</h2>
-            <span className="panel-subtitle">Write window.salla.embedded.* code</span>
+            <span className="panel-subtitle">
+              Write window.salla.embedded.* code
+            </span>
           </div>
           <div className="panel-actions">
-            <Button variant="primary" onClick={handleRun} disabled={isExecuting}>
+            <Button
+              variant="primary"
+              onClick={handleRun}
+              disabled={isExecuting}
+            >
               Run
             </Button>
-            <Button onClick={clearOutput}>
-              Clear Output
-            </Button>
+            <Button onClick={clearOutput}>Clear Output</Button>
           </div>
         </div>
         <div style={{ padding: "var(--space-md)" }}>
@@ -60,4 +63,3 @@ export default function PlaygroundTab({ embedded, logMessage, showToast }) {
     </div>
   );
 }
-
