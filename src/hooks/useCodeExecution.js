@@ -1,5 +1,5 @@
 import { useState, useCallback } from "react";
-/* global console */
+/* global console, setTimeout */
 
 /**
  * Strip %c format specifiers and their style arguments from console log args
@@ -58,6 +58,7 @@ export function useCodeExecution() {
         type: "log",
         args: stripConsoleStyles(...args),
       });
+      updateOutput(); // Update output immediately
       originalConsole.log(...args);
     };
 
@@ -66,6 +67,7 @@ export function useCodeExecution() {
         type: "error",
         args: stripConsoleStyles(...args),
       });
+      updateOutput(); // Update output immediately
       originalConsole.error(...args);
     };
 
@@ -74,6 +76,7 @@ export function useCodeExecution() {
         type: "warn",
         args: stripConsoleStyles(...args),
       });
+      updateOutput(); // Update output immediately
       originalConsole.warn(...args);
     };
 
@@ -82,6 +85,7 @@ export function useCodeExecution() {
         type: "info",
         args: stripConsoleStyles(...args),
       });
+      updateOutput(); // Update output immediately
       originalConsole.info(...args);
     };
 
@@ -90,17 +94,19 @@ export function useCodeExecution() {
         type: "debug",
         args: stripConsoleStyles(...args),
       });
+      updateOutput(); // Update output immediately
       originalConsole.debug(...args);
     };
 
-    const processResult = (result) => {
-      // Restore console
-      Object.assign(console, originalConsole);
+    // Update output incrementally as logs come in
+    const updateOutput = () => {
+      setOutput([...logs]);
+    };
 
-      // Add result to output
-      const newOutput = [...logs];
+    const processResult = (result) => {
+      // Add result to output if present
       if (result !== undefined) {
-        newOutput.push({
+        logs.push({
           type: "result",
           args:
             typeof result === "object"
@@ -109,18 +115,31 @@ export function useCodeExecution() {
         });
       }
 
-      setOutput(newOutput);
+      // Final output update
+      setOutput([...logs]);
       setIsExecuting(false);
+
+      // Restore console after a small delay to catch any final logs
+      setTimeout(() => {
+        Object.assign(console, originalConsole);
+      }, 100);
+
       return { result, logs, error: null };
     };
 
     const processError = (error) => {
-      // Restore console
-      Object.assign(console, originalConsole);
+      // Add error to logs
+      logs.push({ type: "error", args: error.message });
 
-      const newOutput = [...logs, { type: "error", args: error.message }];
-      setOutput(newOutput);
+      // Final output update
+      setOutput([...logs]);
       setIsExecuting(false);
+
+      // Restore console after a small delay to catch any final logs
+      setTimeout(() => {
+        Object.assign(console, originalConsole);
+      }, 100);
+
       return { result: null, logs, error: error.message };
     };
 
