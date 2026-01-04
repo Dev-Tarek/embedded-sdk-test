@@ -1,6 +1,40 @@
 import { useState, useCallback } from "react";
 /* global console */
 
+/**
+ * Strip %c format specifiers and their style arguments from console log args
+ * Handles styled console logs like: console.log('%cText %cMore', 'style1', 'style2', 'message')
+ */
+function stripConsoleStyles(...args) {
+  if (args.length === 0) return "";
+
+  const firstArg = String(args[0]);
+  const percentCMatches = firstArg.match(/%c/g);
+  const styleCount = percentCMatches ? percentCMatches.length : 0;
+
+  // If no %c found, process normally
+  if (styleCount === 0) {
+    return args
+      .map((a) =>
+        typeof a === "object" ? JSON.stringify(a, null, 2) : String(a)
+      )
+      .join(" ");
+  }
+
+  // Remove %c from the format string
+  let cleanedFormat = firstArg.replace(/%c/g, "");
+
+  // Skip style arguments (they come after the format string)
+  const messageArgs = args.slice(1 + styleCount);
+
+  // Combine cleaned format with remaining message args
+  const parts = [cleanedFormat, ...messageArgs].map((a) =>
+    typeof a === "object" ? JSON.stringify(a, null, 2) : String(a)
+  );
+
+  return parts.join(" ");
+}
+
 export function useCodeExecution() {
   const [output, setOutput] = useState([]);
   const [isExecuting, setIsExecuting] = useState(false);
@@ -22,11 +56,7 @@ export function useCodeExecution() {
     console.log = (...args) => {
       logs.push({
         type: "log",
-        args: args
-          .map((a) =>
-            typeof a === "object" ? JSON.stringify(a, null, 2) : String(a)
-          )
-          .join(" "),
+        args: stripConsoleStyles(...args),
       });
       originalConsole.log(...args);
     };
@@ -34,11 +64,7 @@ export function useCodeExecution() {
     console.error = (...args) => {
       logs.push({
         type: "error",
-        args: args
-          .map((a) =>
-            typeof a === "object" ? JSON.stringify(a, null, 2) : String(a)
-          )
-          .join(" "),
+        args: stripConsoleStyles(...args),
       });
       originalConsole.error(...args);
     };
@@ -46,11 +72,7 @@ export function useCodeExecution() {
     console.warn = (...args) => {
       logs.push({
         type: "warn",
-        args: args
-          .map((a) =>
-            typeof a === "object" ? JSON.stringify(a, null, 2) : String(a)
-          )
-          .join(" "),
+        args: stripConsoleStyles(...args),
       });
       originalConsole.warn(...args);
     };
@@ -58,11 +80,7 @@ export function useCodeExecution() {
     console.info = (...args) => {
       logs.push({
         type: "info",
-        args: args
-          .map((a) =>
-            typeof a === "object" ? JSON.stringify(a, null, 2) : String(a)
-          )
-          .join(" "),
+        args: stripConsoleStyles(...args),
       });
       originalConsole.info(...args);
     };
@@ -70,11 +88,7 @@ export function useCodeExecution() {
     console.debug = (...args) => {
       logs.push({
         type: "debug",
-        args: args
-          .map((a) =>
-            typeof a === "object" ? JSON.stringify(a, null, 2) : String(a)
-          )
-          .join(" "),
+        args: stripConsoleStyles(...args),
       });
       originalConsole.debug(...args);
     };
