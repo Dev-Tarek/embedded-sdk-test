@@ -6,9 +6,9 @@
   "main": "index.js",
   "scripts": {
     "sync-types": "node scripts/sync-types.js",
-    "dev": "npm run sync-types && vite",
+    "prebuild": "rm -rf dist && npm run sync-types",
+    "dev": "pnpm prebuild && vite",
     "dev:netlify": "netlify dev",
-    "prebuild": "npm run sync-types",
     "build": "pnpm prebuild && vite build",
     "preview": "vite preview",
     "format": "prettier --write ."
