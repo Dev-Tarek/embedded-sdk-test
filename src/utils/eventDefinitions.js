@@ -5,9 +5,6 @@
  * All events use the `embedded::` namespace prefix.
  */
 
-/* eslint-env browser */
-/* global document, window */
-
 const EmbeddedEvents = {
   // ============================================
   // Iframe Lifecycle Events
@@ -21,7 +18,7 @@ const EmbeddedEvents = {
     description: "Init handshake - request layout context from host",
     payload: {
       event: "embedded::iframe.ready",
-      height: document.body.scrollHeight || 600,
+      height: typeof document !== "undefined" ? document.body.scrollHeight || 600 : 600,
     },
   },
 
@@ -411,8 +408,3 @@ const IncomingEvents = {
 // Export for ESM consumers
 export { EmbeddedEvents, IncomingEvents };
 
-// Also attach to window for any legacy/global usage
-if (typeof window !== "undefined") {
-  window.EmbeddedEvents = EmbeddedEvents;
-  window.IncomingEvents = IncomingEvents;
-}
