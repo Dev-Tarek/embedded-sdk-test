@@ -7,15 +7,15 @@ import Button from "../forms/Button.jsx";
 const DEFAULT_CODE = `// Try the embedded SDK
 async function main() {
   // Example: Initialize and get layout info
-  const { layout } = await window.embedded.init({ debug: true });
+  const { layout } = await window.salla.embedded.init({ debug: true });
   console.log('Layout:', layout);
 
   // Get token from URL
-  const token = window.embedded.auth.getToken();
+  const token = window.salla.embedded.auth.getToken();
   console.log('Token:', token ? 'Found' : 'Not found');
 
   // Signal ready
-  window.embedded.ready();
+  window.salla.embedded.ready();
   console.log('App ready!');
 }
 
@@ -36,12 +36,12 @@ export default function PlaygroundTab({ embedded, logMessage, showToast }) {
   };
 
   return (
-    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "var(--space-lg)", width: "100%", gridColumn: "1 / -1" }}>
+    <div className="playground-container">
       <div className="panel">
         <div className="panel-header">
           <div>
             <h2 className="panel-title">Code Editor</h2>
-            <span className="panel-subtitle">Write window.embedded.* code</span>
+            <span className="panel-subtitle">Write window.salla.embedded.* code</span>
           </div>
           <div className="panel-actions">
             <Button variant="primary" onClick={handleRun} disabled={isExecuting}>
