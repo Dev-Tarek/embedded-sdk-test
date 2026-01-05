@@ -28,21 +28,9 @@ export declare interface AuthModule {
      * Introspect (verify) a short-lived token with Salla's API.
      * This method verifies the token and returns token information.
      *
-     * @param options - Optional parameters (appId and token). If not provided, will be extracted from URL params.
-     * @returns Promise that resolves with the introspect response
-     * @throws {Error} If appId or token is missing, or if the API request fails
-     *
-     * @example
-     * ```typescript
-     * // With explicit parameters
-     * const result = await embedded.auth.introspect({
-     *   appId: 'my-app-id',
-     *   token: 'short-lived-token'
-     * });
-     *
-     * // Using URL params (fallback)
-     * const result = await embedded.auth.introspect();
-     * ```
+     * @param options - Optional params (appId, token, refreshOnError); auto extracted from URL if not provided.
+     * @returns Promise with introspect result.
+     * @throws {Error} If required params missing.
      */
     introspect(options?: IntrospectOptions): Promise<IntrospectResponse>;
 }
@@ -150,13 +138,12 @@ export declare class EmbeddedApp {
      */
     isReady(): boolean;
     /**
-     * Log debug messages if debug mode is enabled.
+     * Unified internal logging function that supports all console log types.
+     *
+     * @param type - Log type (log, warn, error, info, debug)
+     * @param args - Arguments to log
      */
-    private debugLog;
-    /**
-     * Log warnings.
-     */
-    private warn;
+    private internalLog;
     /**
      * Set up listener for theme changes from host.
      */
@@ -309,18 +296,22 @@ declare interface IntrospectOptions {
     appId?: string;
     /** Short-lived token. If not provided, will be extracted from URL params. */
     token?: string;
+    /** Automatically refresh token on error (default: true) */
+    refreshOnError?: boolean;
 }
 
 /**
  * Response from the introspect API.
  */
 declare interface IntrospectResponse {
-    /** HTTP status code */
-    status: number;
-    /** Whether the request was successful */
-    success: boolean;
-    /** Response data */
-    data: IntrospectResponseData;
+    /** Whether the token was verified successfully */
+    isVerified: boolean;
+    /** Whether an error occurred */
+    isError: boolean;
+    /** Error content if an error occurred */
+    error?: unknown;
+    /** Response data (null on error) */
+    data: IntrospectResponseData | null;
 }
 
 /**
