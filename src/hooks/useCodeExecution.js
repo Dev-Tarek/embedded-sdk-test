@@ -52,6 +52,11 @@ export function useCodeExecution() {
       debug: console.debug,
     };
 
+    // Update output incrementally as logs come in
+    const updateOutput = () => {
+      setOutput([...logs]);
+    };
+
     // Intercept all console methods
     console.log = (...args) => {
       logs.push({
@@ -98,11 +103,6 @@ export function useCodeExecution() {
       originalConsole.debug(...args);
     };
 
-    // Update output incrementally as logs come in
-    const updateOutput = () => {
-      setOutput([...logs]);
-    };
-
     const processResult = (result) => {
       // Add result to output if present
       if (result !== undefined) {
@@ -118,11 +118,10 @@ export function useCodeExecution() {
       // Final output update
       setOutput([...logs]);
       setIsExecuting(false);
-
-      // Restore console after a small delay to catch any final logs
+      
       setTimeout(() => {
         Object.assign(console, originalConsole);
-      }, 100);
+      }, 2000);
 
       return { result, logs, error: null };
     };
@@ -135,10 +134,9 @@ export function useCodeExecution() {
       setOutput([...logs]);
       setIsExecuting(false);
 
-      // Restore console after a small delay to catch any final logs
       setTimeout(() => {
         Object.assign(console, originalConsole);
-      }, 100);
+      }, 2000);
 
       return { result: null, logs, error: error.message };
     };
