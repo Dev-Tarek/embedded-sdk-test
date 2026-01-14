@@ -75,14 +75,14 @@ function AppContent() {
           if (event.origin && event.origin !== window.location.origin) {
             setParentOrigin(event.origin);
           }
-          if (event.data.layout) {
-            handleLayoutUpdate(event.data.layout);
+          if (event.data.payload && event.data.payload.layout) {
+            handleLayoutUpdate(event.data.payload.layout);
             showToast("Connected! Received layout context.", "success");
           }
           break;
 
         case "embedded::theme.change":
-          const theme = event.data.theme;
+          const theme = event.data.payload && event.data.payload.theme;
           if (theme) {
             // Theme change is handled by useTheme hook via URL or localStorage
             showToast("Theme changed by host: " + theme, "info");
@@ -90,8 +90,10 @@ function AppContent() {
           break;
 
         case "embedded::nav.actionClick":
+          const url = event.data.payload && event.data.payload.url;
+          const value = event.data.payload && event.data.payload.value;
           showToast(
-            `Action clicked! URL: ${event.data.url || "N/A"}, Value: ${event.data.value || "N/A"}`,
+            `Action clicked! URL: ${url || "N/A"}, Value: ${value || "N/A"}`,
             "info"
           );
           logMessage("incoming", event.data);

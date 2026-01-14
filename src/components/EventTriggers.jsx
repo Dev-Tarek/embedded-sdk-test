@@ -185,7 +185,7 @@ export default function EventTriggers({
         }
 
         case "embedded::checkout.create":
-          embedded.checkout.create(payload.payload);
+          embedded.checkout.create(payload);
           break;
 
         case "embedded::log":
