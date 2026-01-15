@@ -32,6 +32,7 @@ function AppContent() {
   const [activeTab, setActiveTab] = useState("test-console");
   const [eventPayload, setEventPayload] = useState(null);
   const bootstrapInitiatedRef = useRef(false);
+  const isInIframeRef = useRef(false);
 
   // Handle layout update
   const handleLayoutUpdate = useCallback(
@@ -111,16 +112,12 @@ function AppContent() {
     return () => window.removeEventListener("message", handleIncomingMessage);
   }, [isConnected, logMessage, showToast, handleLayoutUpdate, setTheme]);
 
-  // Store bootstrap in ref to avoid dependency issues
-  const bootstrapRef = useRef(bootstrap);
-  useEffect(() => {
-    bootstrapRef.current = bootstrap;
-  }, [bootstrap]);
-
   // Detect iframe mode
   useEffect(() => {
     const isInIframe = window.parent !== window;
     const hasOpener = window.opener !== null;
+
+    isInIframeRef.current = isInIframe;
 
     if (!isInIframe && !hasOpener) {
       setIframeMode("standalone");
@@ -145,16 +142,16 @@ function AppContent() {
         setParentOrigin("—");
       }
     }
+  }, []);
 
-    // Auto-bootstrap if in iframe (only once)
-    if (isInIframe && !bootstrapInitiatedRef.current) {
+  useEffect(() => {
+    if (isInIframeRef.current && bootstrap && !bootstrapInitiatedRef.current) {
       bootstrapInitiatedRef.current = true;
       setTimeout(() => {
-        bootstrapRef.current();
+        bootstrap();
       }, 500);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // Only run once on mount
+  }, [bootstrap]);
 
   // Handle event button click - update payload editor
   const handleEventClick = useCallback((eventName, payload) => {
