@@ -1,4 +1,4 @@
-import { useTheme } from "../hooks/useTheme.js";
+import { useTheme } from "../contexts/ThemeContext.jsx";
 import { Sun, Moon, Code2 } from "lucide-react";
 import Button from "./forms/Button.jsx";
 
@@ -9,7 +9,7 @@ export default function Header() {
     <header className="header">
       <div className="header-left">
         <div className="logo">
-          <Code2 size={32} />
+          <Code2 size={28} />
         </div>
         <h1 className="header-title">Embedded SDK Test Console</h1>
         <span className="header-version">v0.1.0-beta.12</span>

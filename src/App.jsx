@@ -1,9 +1,10 @@
 import { useState, useEffect, useCallback, useRef } from "react";
-import { useTheme } from "./hooks/useTheme.js";
+import { useTheme } from "./contexts/ThemeContext.jsx";
 import { useEmbeddedSDK } from "./hooks/useEmbeddedSDK.js";
 import { useBootstrap } from "./hooks/useBootstrap.js";
 import { useMessageLog } from "./hooks/useMessageLog.js";
 import { ToastProvider, useToast } from "./contexts/ToastContext.jsx";
+import { ThemeProvider } from "./contexts/ThemeContext.jsx";
 import Header from "./components/Header.jsx";
 import StatusBar from "./components/StatusBar.jsx";
 import Tabs from "./components/Tabs.jsx";
@@ -251,9 +252,11 @@ function AppContent() {
 
 function App() {
   return (
-    <ToastProvider>
-      <AppContent />
-    </ToastProvider>
+    <ThemeProvider>
+      <ToastProvider>
+        <AppContent />
+      </ToastProvider>
+    </ThemeProvider>
   );
 }
 

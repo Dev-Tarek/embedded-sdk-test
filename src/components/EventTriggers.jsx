@@ -135,11 +135,10 @@ export default function EventTriggers({
           break;
 
         case "embedded::ui.loading-show":
-          embedded.ui.loading.show();
-          showToast(
-            "Loading event sent. You should call embedded.ui.loading.hide() to re-show the App. This test App will automatically hide loading after 10 seconds",
-            "info"
+          embedded.ui.toast.info(
+            "Loading event sent. You should call embedded.ui.loading.hide() to re-show the App. This test App will automatically hide loading after 10 seconds"
           );
+          embedded.ui.loading.show();
           setTimeout(() => {
             embedded.ui.loading.hide();
           }, 10000);
