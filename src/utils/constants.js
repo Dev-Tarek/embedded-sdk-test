@@ -4,5 +4,5 @@ export const VERIFY_FUNCTION_URL = "/.netlify/functions/verify-token";
 // App ID - can be overridden via URL parameter ?appId=XXX
 export function getAppId() {
   const urlParams = new URLSearchParams(window.location.search);
-  return urlParams.get("appId") || 1888000112;
+  return urlParams.get("app_id") || 1888000112;
 }
