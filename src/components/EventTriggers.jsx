@@ -39,11 +39,17 @@ export default function EventTriggers({
       payload.height = document.body.scrollHeight || 600;
     }
 
+    // Notify payload editor about the clicked event
+    if (onEventClick) {
+      onEventClick(eventName, payload);
+    }
+
     await sendSdkEvent(eventName, payload);
   };
 
   const sendSdkEvent = async (eventName, payload) => {
-    logMessage("outgoing", payload);
+    // Log with event name included for proper display
+    logMessage("outgoing", { event: eventName, ...payload });
 
     try {
       switch (eventName) {
@@ -197,7 +203,7 @@ export default function EventTriggers({
       }
     } catch (error) {
       showToast("Failed to send SDK event: " + error.message, "error");
-      logMessage("outgoing", payload, error.message);
+      logMessage("outgoing", { event: eventName, ...payload }, error.message);
     }
   };
 

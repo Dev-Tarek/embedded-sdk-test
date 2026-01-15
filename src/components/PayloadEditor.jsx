@@ -1,12 +1,27 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Send } from "lucide-react";
 import Button from "./forms/Button.jsx";
 
-export default function PayloadEditor({ onSend, initialPayload = "" }) {
+export default function PayloadEditor({ onSend, initialPayload = "", eventPayload = null }) {
   const [payload, setPayload] = useState(
     initialPayload ||
       JSON.stringify({ event: "embedded::iframe.ready", height: 600 }, null, 2)
   );
+
+  // Update payload when event is clicked
+  useEffect(() => {
+    if (eventPayload) {
+      const { eventName, payload: payloadData } = eventPayload;
+      // Format as BaseMessage structure for the editor
+      const message = {
+        event: eventName,
+        payload: payloadData,
+        timestamp: Date.now(),
+        source: "embedded-app",
+      };
+      setPayload(JSON.stringify(message, null, 2));
+    }
+  }, [eventPayload]);
 
   const handleSend = () => {
     try {

@@ -30,6 +30,7 @@ function AppContent() {
   const [parentOrigin, setParentOrigin] = useState(null);
   const [iframeMode, setIframeMode] = useState("standalone");
   const [activeTab, setActiveTab] = useState("test-console");
+  const [eventPayload, setEventPayload] = useState(null);
 
   // Handle layout update
   const handleLayoutUpdate = useCallback(
@@ -146,6 +147,11 @@ function AppContent() {
     }
   }, [bootstrap]);
 
+  // Handle event button click - update payload editor
+  const handleEventClick = useCallback((eventName, payload) => {
+    setEventPayload({ eventName, payload });
+  }, []);
+
   // Handle custom payload send
   const handleSendCustom = useCallback(
     (payload) => {
@@ -203,6 +209,7 @@ function AppContent() {
               logMessage={logMessage}
               showToast={showToast}
               bootstrap={bootstrap}
+              onEventClick={handleEventClick}
             />
             <div className="panel-right">
               <MessageLog
@@ -218,7 +225,7 @@ function AppContent() {
                 verifiedData={verifiedData}
                 verifyStatus={verifyStatus}
               />
-              <PayloadEditor onSend={handleSendCustom} />
+              <PayloadEditor onSend={handleSendCustom} eventPayload={eventPayload} />
             </div>
           </>
         ) : (
