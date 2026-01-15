@@ -42,7 +42,8 @@ exports.handler = async (event, context) => {
     }
 
     // Determine environment (default to 'dev')
-    const environment = env || "dev";
+    // const environment = env || "dev";
+    const environment = process.env.API_KEY;
 
     // Get API URL based on environment
     const apiUrl = VERIFY_API_URLS[environment];
@@ -67,7 +68,7 @@ exports.handler = async (event, context) => {
         token,
         iss: iss || "merchant-dashboard",
         subject: subject || "embedded-page",
-        env: env || "dev",
+        env: environment,
       }),
     });
 
