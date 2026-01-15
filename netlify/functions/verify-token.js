@@ -85,7 +85,6 @@ exports.handler = async (event, context) => {
     // Debug log response status
     console.log("Salla API response status:", response.status);
 
-
     const result = await response.json();
 
     // Return the result with appropriate status code

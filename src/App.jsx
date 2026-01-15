@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useTheme } from "./hooks/useTheme.js";
 import { useEmbeddedSDK } from "./hooks/useEmbeddedSDK.js";
 import { useBootstrap } from "./hooks/useBootstrap.js";
@@ -31,6 +31,7 @@ function AppContent() {
   const [iframeMode, setIframeMode] = useState("standalone");
   const [activeTab, setActiveTab] = useState("test-console");
   const [eventPayload, setEventPayload] = useState(null);
+  const bootstrapInitiatedRef = useRef(false);
 
   // Handle layout update
   const handleLayoutUpdate = useCallback(
@@ -110,6 +111,12 @@ function AppContent() {
     return () => window.removeEventListener("message", handleIncomingMessage);
   }, [isConnected, logMessage, showToast, handleLayoutUpdate, setTheme]);
 
+  // Store bootstrap in ref to avoid dependency issues
+  const bootstrapRef = useRef(bootstrap);
+  useEffect(() => {
+    bootstrapRef.current = bootstrap;
+  }, [bootstrap]);
+
   // Detect iframe mode
   useEffect(() => {
     const isInIframe = window.parent !== window;
@@ -139,13 +146,15 @@ function AppContent() {
       }
     }
 
-    // Auto-bootstrap if in iframe
-    if (isInIframe) {
+    // Auto-bootstrap if in iframe (only once)
+    if (isInIframe && !bootstrapInitiatedRef.current) {
+      bootstrapInitiatedRef.current = true;
       setTimeout(() => {
-        bootstrap();
+        bootstrapRef.current();
       }, 500);
     }
-  }, [bootstrap]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Only run once on mount
 
   // Handle event button click - update payload editor
   const handleEventClick = useCallback((eventName, payload) => {
@@ -225,7 +234,10 @@ function AppContent() {
                 verifiedData={verifiedData}
                 verifyStatus={verifyStatus}
               />
-              <PayloadEditor onSend={handleSendCustom} eventPayload={eventPayload} />
+              <PayloadEditor
+                onSend={handleSendCustom}
+                eventPayload={eventPayload}
+              />
             </div>
           </>
         ) : (

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 
 export function useTheme() {
   const [isDarkMode, setIsDarkMode] = useState(() => {
@@ -24,14 +24,20 @@ export function useTheme() {
     localStorage.setItem("theme", dark ? "dark" : "light");
   };
 
-  const toggleTheme = () => {
+  const toggleTheme = useCallback(() => {
     setIsDarkMode((prev) => !prev);
-  };
+  }, []);
 
-  const setTheme = (theme) => {
+  const setTheme = useCallback((theme) => {
     const isDark = theme === "dark";
-    setIsDarkMode(isDark);
-  };
+    setIsDarkMode((prev) => {
+      // Only update if theme actually changed
+      if (prev === isDark) {
+        return prev;
+      }
+      return isDark;
+    });
+  }, []);
 
   return { isDarkMode, toggleTheme, setTheme };
 }

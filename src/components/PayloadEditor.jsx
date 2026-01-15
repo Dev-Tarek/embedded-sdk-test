@@ -2,7 +2,11 @@ import { useState, useEffect } from "react";
 import { Send } from "lucide-react";
 import Button from "./forms/Button.jsx";
 
-export default function PayloadEditor({ onSend, initialPayload = "", eventPayload = null }) {
+export default function PayloadEditor({
+  onSend,
+  initialPayload = "",
+  eventPayload = null,
+}) {
   const [payload, setPayload] = useState(
     initialPayload ||
       JSON.stringify({ event: "embedded::iframe.ready", height: 600 }, null, 2)

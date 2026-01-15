@@ -285,6 +285,7 @@ interface BaseMessage {
 ```
 
 **Actions:**
+
 - `"show"` - Show loading indicator
 - `"hide"` - Hide loading indicator
 
