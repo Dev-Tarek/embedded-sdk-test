@@ -14,7 +14,7 @@ import PayloadEditor from "./components/PayloadEditor.jsx";
 import PlaygroundTab from "./components/Playground/PlaygroundTab.jsx";
 
 function AppContent() {
-  const { isDarkMode } = useTheme();
+  const { setTheme } = useTheme();
   const { embedded, layoutData, setLayoutData, init } = useEmbeddedSDK();
   const { showToast } = useToast();
   const {
@@ -37,10 +37,10 @@ function AppContent() {
     (layout) => {
       setLayoutData(layout);
       if (layout.theme) {
-        // Theme is handled by useTheme hook
+        setTheme(layout.theme);
       }
     },
-    [setLayoutData]
+    [setLayoutData, setTheme]
   );
 
   // Handle verified data update
@@ -85,7 +85,7 @@ function AppContent() {
         case "embedded::theme.change":
           const theme = event.data.payload && event.data.payload.theme;
           if (theme) {
-            // Theme change is handled by useTheme hook via URL or localStorage
+            setTheme(theme);
             showToast("Theme changed by host: " + theme, "info");
           }
           break;
@@ -108,7 +108,7 @@ function AppContent() {
 
     window.addEventListener("message", handleIncomingMessage);
     return () => window.removeEventListener("message", handleIncomingMessage);
-  }, [isConnected, logMessage, showToast, handleLayoutUpdate]);
+  }, [isConnected, logMessage, showToast, handleLayoutUpdate, setTheme]);
 
   // Detect iframe mode
   useEffect(() => {
