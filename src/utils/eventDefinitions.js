@@ -182,10 +182,8 @@ const EmbeddedEvents = {
     category: "ui",
     description: "Show loading indicator (content not ready)",
     payload: {
-      status: false,
-      mode: "full",
+      action: "show",
     },
-    configurable: ["mode"],
   },
 
   /**
@@ -195,10 +193,8 @@ const EmbeddedEvents = {
     category: "ui",
     description: "Hide loading indicator (content ready)",
     payload: {
-      status: true,
-      mode: "full",
+      action: "hide",
     },
-    configurable: ["mode"],
   },
 
   /**
