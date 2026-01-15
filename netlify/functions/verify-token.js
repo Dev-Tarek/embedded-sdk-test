@@ -57,6 +57,16 @@ exports.handler = async (event, context) => {
       };
     }
 
+    // Debug log request details
+    console.log("Verifying token with Salla API", {
+      apiUrl: atob(apiUrl),
+      appId,
+      token: token ? "[REDACTED]" : undefined,
+      iss: iss || "merchant-dashboard",
+      subject: subject || "embedded-page",
+      env: environment,
+    });
+
     // Make request to Salla API
     const response = await fetch(atob(apiUrl), {
       method: "POST",
@@ -71,6 +81,10 @@ exports.handler = async (event, context) => {
         env: environment,
       }),
     });
+
+    // Debug log response status
+    console.log("Salla API response status:", response.status);
+
 
     const result = await response.json();
 
