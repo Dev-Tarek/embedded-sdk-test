@@ -43,7 +43,7 @@ exports.handler = async (event, context) => {
 
     // Determine environment (default to 'dev')
     // const environment = env || "dev";
-    const environment = process.env.API_KEY;
+    const environment = process.env.ENV;
 
     // Get API URL based on environment
     const apiUrl = VERIFY_API_URLS[environment];
