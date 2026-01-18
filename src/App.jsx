@@ -1,9 +1,10 @@
-import { useState, useEffect, useCallback } from "react";
-import { useTheme } from "./hooks/useTheme.js";
+import { useState, useEffect, useCallback, useRef } from "react";
+import { useTheme } from "./contexts/ThemeContext.jsx";
 import { useEmbeddedSDK } from "./hooks/useEmbeddedSDK.js";
 import { useBootstrap } from "./hooks/useBootstrap.js";
 import { useMessageLog } from "./hooks/useMessageLog.js";
 import { ToastProvider, useToast } from "./contexts/ToastContext.jsx";
+import { ThemeProvider } from "./contexts/ThemeContext.jsx";
 import Header from "./components/Header.jsx";
 import StatusBar from "./components/StatusBar.jsx";
 import Tabs from "./components/Tabs.jsx";
@@ -14,7 +15,7 @@ import PayloadEditor from "./components/PayloadEditor.jsx";
 import PlaygroundTab from "./components/Playground/PlaygroundTab.jsx";
 
 function AppContent() {
-  const { isDarkMode } = useTheme();
+  const { setTheme } = useTheme();
   const { embedded, layoutData, setLayoutData, init } = useEmbeddedSDK();
   const { showToast } = useToast();
   const {
@@ -30,16 +31,19 @@ function AppContent() {
   const [parentOrigin, setParentOrigin] = useState(null);
   const [iframeMode, setIframeMode] = useState("standalone");
   const [activeTab, setActiveTab] = useState("test-console");
+  const [eventPayload, setEventPayload] = useState(null);
+  const bootstrapInitiatedRef = useRef(false);
+  const isInIframeRef = useRef(false);
 
   // Handle layout update
   const handleLayoutUpdate = useCallback(
     (layout) => {
       setLayoutData(layout);
       if (layout.theme) {
-        // Theme is handled by useTheme hook
+        setTheme(layout.theme);
       }
     },
-    [setLayoutData]
+    [setLayoutData, setTheme]
   );
 
   // Handle verified data update
@@ -75,23 +79,25 @@ function AppContent() {
           if (event.origin && event.origin !== window.location.origin) {
             setParentOrigin(event.origin);
           }
-          if (event.data.layout) {
-            handleLayoutUpdate(event.data.layout);
+          if (event.data.payload && event.data.payload.layout) {
+            handleLayoutUpdate(event.data.payload.layout);
             showToast("Connected! Received layout context.", "success");
           }
           break;
 
         case "embedded::theme.change":
-          const theme = event.data.theme;
+          const theme = event.data.payload && event.data.payload.theme;
           if (theme) {
-            // Theme change is handled by useTheme hook via URL or localStorage
+            setTheme(theme);
             showToast("Theme changed by host: " + theme, "info");
           }
           break;
 
         case "embedded::nav.actionClick":
+          const url = event.data.payload && event.data.payload.url;
+          const value = event.data.payload && event.data.payload.value;
           showToast(
-            `Action clicked! URL: ${event.data.url || "N/A"}, Value: ${event.data.value || "N/A"}`,
+            `Action clicked! URL: ${url || "N/A"}, Value: ${value || "N/A"}`,
             "info"
           );
           logMessage("incoming", event.data);
@@ -105,12 +111,14 @@ function AppContent() {
 
     window.addEventListener("message", handleIncomingMessage);
     return () => window.removeEventListener("message", handleIncomingMessage);
-  }, [isConnected, logMessage, showToast, handleLayoutUpdate]);
+  }, [isConnected, logMessage, showToast, handleLayoutUpdate, setTheme]);
 
   // Detect iframe mode
   useEffect(() => {
     const isInIframe = window.parent !== window;
     const hasOpener = window.opener !== null;
+
+    isInIframeRef.current = isInIframe;
 
     if (!isInIframe && !hasOpener) {
       setIframeMode("standalone");
@@ -135,14 +143,21 @@ function AppContent() {
         setParentOrigin("—");
       }
     }
+  }, []);
 
-    // Auto-bootstrap if in iframe
-    if (isInIframe) {
+  useEffect(() => {
+    if (isInIframeRef.current && bootstrap && !bootstrapInitiatedRef.current) {
+      bootstrapInitiatedRef.current = true;
       setTimeout(() => {
         bootstrap();
       }, 500);
     }
   }, [bootstrap]);
+
+  // Handle event button click - update payload editor
+  const handleEventClick = useCallback((eventName, payload) => {
+    setEventPayload({ eventName, payload });
+  }, []);
 
   // Handle custom payload send
   const handleSendCustom = useCallback(
@@ -201,6 +216,7 @@ function AppContent() {
               logMessage={logMessage}
               showToast={showToast}
               bootstrap={bootstrap}
+              onEventClick={handleEventClick}
             />
             <div className="panel-right">
               <MessageLog
@@ -216,7 +232,10 @@ function AppContent() {
                 verifiedData={verifiedData}
                 verifyStatus={verifyStatus}
               />
-              <PayloadEditor onSend={handleSendCustom} />
+              <PayloadEditor
+                onSend={handleSendCustom}
+                eventPayload={eventPayload}
+              />
             </div>
           </>
         ) : (
@@ -233,9 +252,11 @@ function AppContent() {
 
 function App() {
   return (
-    <ToastProvider>
-      <AppContent />
-    </ToastProvider>
+    <ThemeProvider>
+      <ToastProvider>
+        <AppContent />
+      </ToastProvider>
+    </ThemeProvider>
   );
 }
 

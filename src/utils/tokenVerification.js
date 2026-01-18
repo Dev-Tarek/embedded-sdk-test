@@ -16,7 +16,7 @@ export async function verifyToken(token) {
         appId: getAppId(),
         iss: "merchant-dashboard",
         subject: "embedded-page",
-        env: "prod",
+        // env: "prod",
       }),
     });
 

@@ -118,7 +118,7 @@ export function useCodeExecution() {
       // Final output update
       setOutput([...logs]);
       setIsExecuting(false);
-      
+
       setTimeout(() => {
         Object.assign(console, originalConsole);
       }, 2000);

@@ -5,10 +5,10 @@
  * to the Salla exchange authority service.
  */
 
-// Environment-based API URLs (base64 encoded)
+// Environment-based API URLs
 const VERIFY_API_URLS = {
-  dev: "aHR0cHM6Ly9leGNoYW5nZS1hdXRob3JpdHktc2VydmljZS1kZXYtNTkubWVyY2hhbnRzLndvcmtlcnMuZGV2L2V4Y2hhbmdlLWF1dGhvcml0eS92MS92ZXJpZnk",
-  prod: "aHR0cHM6Ly9hcGkuc2FsbGEuZGV2L2V4Y2hhbmdlLWF1dGhvcml0eS92MS92ZXJpZnk=",
+  dev: "https://exchange-authority-service-dev-59.merchants.workers.dev/exchange-authority/v1/verify",
+  prod: "https://api.salla.dev/exchange-authority/v1/verify",
 };
 
 exports.handler = async (event, context) => {
@@ -42,7 +42,8 @@ exports.handler = async (event, context) => {
     }
 
     // Determine environment (default to 'dev')
-    const environment = env || "dev";
+    // const environment = env || "dev";
+    const environment = process.env.ENV;
 
     // Get API URL based on environment
     const apiUrl = VERIFY_API_URLS[environment];
@@ -56,8 +57,18 @@ exports.handler = async (event, context) => {
       };
     }
 
+    // Debug log request details
+    console.log("Verifying token with Salla API", {
+      apiUrl: apiUrl,
+      appId,
+      token: token ? "[REDACTED]" : undefined,
+      iss: iss || "merchant-dashboard",
+      subject: subject || "embedded-page",
+      env: environment,
+    });
+
     // Make request to Salla API
-    const response = await fetch(atob(apiUrl), {
+    const response = await fetch(apiUrl, {
       method: "POST",
       headers: {
         "s-source": appId, // APP ID (dynamic)
@@ -67,9 +78,12 @@ exports.handler = async (event, context) => {
         token,
         iss: iss || "merchant-dashboard",
         subject: subject || "embedded-page",
-        env: env || "dev",
+        env: environment,
       }),
     });
+
+    // Debug log response status
+    console.log("Salla API response status:", response.status);
 
     const result = await response.json();
 

@@ -39,11 +39,17 @@ export default function EventTriggers({
       payload.height = document.body.scrollHeight || 600;
     }
 
+    // Notify payload editor about the clicked event
+    if (onEventClick) {
+      onEventClick(eventName, payload);
+    }
+
     await sendSdkEvent(eventName, payload);
   };
 
   const sendSdkEvent = async (eventName, payload) => {
-    logMessage("outgoing", payload);
+    // Log with event name included for proper display
+    logMessage("outgoing", { event: eventName, ...payload });
 
     try {
       switch (eventName) {
@@ -129,7 +135,13 @@ export default function EventTriggers({
           break;
 
         case "embedded::ui.loading-show":
-          embedded.ui.loading.show(payload.mode);
+          embedded.ui.toast.info(
+            "Loading event sent. You should call embedded.ui.loading.hide() to re-show the App. This test App will automatically hide loading after 10 seconds"
+          );
+          embedded.ui.loading.show();
+          setTimeout(() => {
+            embedded.ui.loading.hide();
+          }, 10000);
           break;
 
         case "embedded::ui.loading-hide":
@@ -185,7 +197,7 @@ export default function EventTriggers({
         }
 
         case "embedded::checkout.create":
-          embedded.checkout.create(payload.payload);
+          embedded.checkout.create(payload);
           break;
 
         case "embedded::log":
@@ -197,7 +209,7 @@ export default function EventTriggers({
       }
     } catch (error) {
       showToast("Failed to send SDK event: " + error.message, "error");
-      logMessage("outgoing", payload, error.message);
+      logMessage("outgoing", { event: eventName, ...payload }, error.message);
     }
   };
 

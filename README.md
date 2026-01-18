@@ -1,4 +1,4 @@
-# Embedded SDK Test Console v0.1.0-beta.10
+# Embedded SDK Test Console v0.1.0-beta.12
 
 A developer testing tool for the Salla Embedded SDK postMessage communication.
 
@@ -146,12 +146,32 @@ Content-Type: application/json
 
 ## Event Payloads
 
+All events follow the BaseMessage structure:
+
+```typescript
+interface BaseMessage {
+  event: string;
+  payload: Record<string, unknown>;
+  timestamp: number;
+  source: "embedded-app" | "merchant-dashboard";
+  requestId?: string;
+  metadata?: {
+    version: string;
+    [key: string]: unknown;
+  };
+}
+```
+
 ### `embedded::iframe.ready`
 
 ```json
 {
   "event": "embedded::iframe.ready",
-  "height": 600
+  "payload": {
+    "height": 600
+  },
+  "timestamp": 1234567890,
+  "source": "embedded-app"
 }
 ```
 
@@ -159,7 +179,10 @@ Content-Type: application/json
 
 ```json
 {
-  "event": "embedded::ready"
+  "event": "embedded::ready",
+  "payload": {},
+  "timestamp": 1234567890,
+  "source": "embedded-app"
 }
 ```
 
@@ -167,7 +190,10 @@ Content-Type: application/json
 
 ```json
 {
-  "event": "embedded::auth.refresh"
+  "event": "embedded::auth.refresh",
+  "payload": {},
+  "timestamp": 1234567890,
+  "source": "embedded-app"
 }
 ```
 
@@ -175,7 +201,10 @@ Content-Type: application/json
 
 ```json
 {
-  "event": "embedded::destroy"
+  "event": "embedded::destroy",
+  "payload": {},
+  "timestamp": 1234567890,
+  "source": "embedded-app"
 }
 ```
 
@@ -184,9 +213,13 @@ Content-Type: application/json
 ```json
 {
   "event": "embedded::page.navigate",
-  "path": "/products",
-  "state": {},
-  "replace": false
+  "payload": {
+    "path": "/products",
+    "state": {},
+    "replace": false
+  },
+  "timestamp": 1234567890,
+  "source": "embedded-app"
 }
 ```
 
@@ -195,7 +228,11 @@ Content-Type: application/json
 ```json
 {
   "event": "embedded::page.redirect",
-  "url": "https://external-site.com"
+  "payload": {
+    "url": "https://external-site.com"
+  },
+  "timestamp": 1234567890,
+  "source": "embedded-app"
 }
 ```
 
@@ -204,7 +241,11 @@ Content-Type: application/json
 ```json
 {
   "event": "embedded::page.setTitle",
-  "title": "My App - Product Details"
+  "payload": {
+    "title": "My App - Product Details"
+  },
+  "timestamp": 1234567890,
+  "source": "embedded-app"
 }
 ```
 
@@ -213,13 +254,20 @@ Content-Type: application/json
 ```json
 {
   "event": "embedded::nav.setAction",
-  "title": "Add Product",
-  "url": "/products/new",
-  "value": "create",
-  "extendedActions": [
-    { "title": "Import", "value": "import" },
-    { "title": "Export", "value": "export" }
-  ]
+  "payload": {
+    "title": "Add Product",
+    "onClick": true,
+    "value": "create",
+    "subTitle": "Create a new product",
+    "icon": "sicon-add",
+    "disabled": false,
+    "extendedActions": [
+      { "title": "Import", "value": "import" },
+      { "title": "Export", "value": "export" }
+    ]
+  },
+  "timestamp": 1234567890,
+  "source": "embedded-app"
 }
 ```
 
@@ -228,19 +276,31 @@ Content-Type: application/json
 ```json
 {
   "event": "embedded::ui.loading",
-  "status": false,
-  "mode": "full"
+  "payload": {
+    "action": "show"
+  },
+  "timestamp": 1234567890,
+  "source": "embedded-app"
 }
 ```
+
+**Actions:**
+
+- `"show"` - Show loading indicator
+- `"hide"` - Hide loading indicator
 
 ### `embedded::ui.toast`
 
 ```json
 {
   "event": "embedded::ui.toast",
-  "type": "success",
-  "message": "Operation completed!",
-  "duration": 3000
+  "payload": {
+    "type": "success",
+    "message": "Operation completed!",
+    "duration": 3000
+  },
+  "timestamp": 1234567890,
+  "source": "embedded-app"
 }
 ```
 
@@ -249,13 +309,20 @@ Content-Type: application/json
 ```json
 {
   "event": "embedded::ui.confirm",
-  "title": "Delete Product?",
-  "message": "This action cannot be undone.",
-  "confirmText": "Delete",
-  "cancelText": "Cancel",
-  "variant": "danger"
+  "payload": {
+    "title": "Delete Product?",
+    "message": "This action cannot be undone.",
+    "confirmText": "Delete",
+    "cancelText": "Cancel",
+    "variant": "danger"
+  },
+  "requestId": "req-1234567890",
+  "timestamp": 1234567890,
+  "source": "embedded-app"
 }
 ```
+
+**Note:** `requestId` is at the root level (not in payload) for async request/response patterns.
 
 ### `embedded::checkout.create`
 
@@ -266,7 +333,9 @@ Content-Type: application/json
     "amount": 299.99,
     "currency": "SAR",
     "items": [{ "id": "PROD_001", "quantity": 1 }]
-  }
+  },
+  "timestamp": 1234567890,
+  "source": "embedded-app"
 }
 ```
 
@@ -275,11 +344,15 @@ Content-Type: application/json
 ```json
 {
   "event": "embedded::log",
-  "level": "info",
-  "message": "Test log message",
-  "context": {
-    "component": "TestConsole"
-  }
+  "payload": {
+    "level": "info",
+    "message": "Test log message",
+    "context": {
+      "component": "TestConsole"
+    }
+  },
+  "timestamp": 1234567890,
+  "source": "embedded-app"
 }
 ```
 
