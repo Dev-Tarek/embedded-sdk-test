@@ -66,7 +66,6 @@ All events use the `embedded::` namespace prefix.
 | ---------------------- | --------------------------- |
 | `embedded::ui.loading` | Show/hide loading indicator |
 | `embedded::ui.toast`   | Show toast notification     |
-| `embedded::ui.modal`   | Open/close modal dialog     |
 | `embedded::ui.confirm` | Show confirm dialog (async) |
 
 #### Business
@@ -74,12 +73,6 @@ All events use the `embedded::` namespace prefix.
 | Event                       | Description               |
 | --------------------------- | ------------------------- |
 | `embedded::checkout.create` | Initiate checkout process |
-
-#### Logging
-
-| Event           | Description              |
-| --------------- | ------------------------ |
-| `embedded::log` | Send log message to host |
 
 ### Incoming Events (Host → App)
 
@@ -333,23 +326,6 @@ interface BaseMessage {
     "amount": 299.99,
     "currency": "SAR",
     "items": [{ "id": "PROD_001", "quantity": 1 }]
-  },
-  "timestamp": 1234567890,
-  "source": "embedded-app"
-}
-```
-
-### `embedded::log`
-
-```json
-{
-  "event": "embedded::log",
-  "payload": {
-    "level": "info",
-    "message": "Test log message",
-    "context": {
-      "component": "TestConsole"
-    }
   },
   "timestamp": 1234567890,
   "source": "embedded-app"
