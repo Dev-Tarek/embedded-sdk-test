@@ -1,14 +1,5 @@
 import { EmbeddedEvents } from "../utils/eventDefinitions.js";
-import {
-  Clock,
-  Lock,
-  Home,
-  Menu,
-  Grid3x3,
-  Bell,
-  Square,
-  ShoppingBag,
-} from "lucide-react";
+import { Clock, Lock, Home, Menu, Grid3x3, Bell, Square } from "lucide-react";
 import Button from "./forms/Button.jsx";
 import logger from "../utils/logger.js";
 
@@ -75,8 +66,8 @@ export default function EventTriggers({
           try {
             const result = await embedded.auth.introspect();
             showToast(
-              `Introspect success! Token ID: ${result.data.id}, User ID: ${result.data.user_id}`,
-              "success"
+              `Introspect success! Merchant ID: ${result.data.merchant_id}, User ID: ${result.data.user_id}`,
+              "success",
             );
             logMessage("incoming", {
               event: "embedded::auth.introspect.response",
@@ -117,11 +108,6 @@ export default function EventTriggers({
         case "embedded::nav.setAction":
           embedded.nav.setAction({
             title: payload.title,
-            onClick: payload.onClick
-              ? () => {
-                  logger.log("Action button clicked");
-                }
-              : undefined,
             value: payload.value,
             subTitle: payload.subTitle,
             icon: payload.icon,
@@ -136,7 +122,7 @@ export default function EventTriggers({
 
         case "embedded::ui.loading-show":
           embedded.ui.toast.info(
-            "Loading event sent. You should call embedded.ui.loading.hide() to re-show the App. This test App will automatically hide loading after 10 seconds"
+            "Loading event sent. You should call embedded.ui.loading.hide() to re-show the App. This test App will automatically hide loading after 10 seconds",
           );
           embedded.ui.loading.show();
           setTimeout(() => {
@@ -164,14 +150,6 @@ export default function EventTriggers({
           embedded.ui.toast.info(payload.message, payload.duration);
           break;
 
-        case "embedded::ui.modal-open":
-          embedded.ui.modal.open(payload.id, payload.content);
-          break;
-
-        case "embedded::ui.modal-close":
-          embedded.ui.modal.close(payload.id);
-          break;
-
         case "embedded::ui.confirm": {
           showToast("Waiting for confirm dialog response...", "info");
           try {
@@ -184,7 +162,7 @@ export default function EventTriggers({
             });
             showToast(
               `Confirm result: ${result.confirmed ? "✓ Confirmed" : "✗ Cancelled"}`,
-              result.confirmed ? "success" : "info"
+              result.confirmed ? "success" : "info",
             );
             logMessage("incoming", {
               event: "embedded::ui.confirm.response",
@@ -195,14 +173,6 @@ export default function EventTriggers({
           }
           break;
         }
-
-        case "embedded::checkout.create":
-          embedded.checkout.create(payload);
-          break;
-
-        case "embedded::log":
-          embedded.log(payload.level, payload.message, payload.context);
-          break;
 
         default:
           showToast("No Embedded SDK handler for event: " + eventName, "error");
@@ -393,58 +363,19 @@ export default function EventTriggers({
         </div>
       </section>
 
-      {/* Modal & Dialogs */}
+      {/* Dialogs */}
       <section className="event-section">
         <h3 className="section-title">
           <Square size={16} />
-          Modal & Dialogs
+          Dialogs
         </h3>
         <div className="button-grid">
-          <Button
-            event
-            variant="toggle"
-            label="Open Modal"
-            hint="ui.modal (open)"
-            onClick={() => handleEventButtonClick("embedded::ui.modal-open")}
-            disabled
-          />
-          <Button
-            event
-            label="Close Modal"
-            hint="ui.modal (close)"
-            onClick={() => handleEventButtonClick("embedded::ui.modal-close")}
-            disabled
-          />
           <Button
             event
             variant="accent"
             label="⚡ Confirm (Async)"
             hint="ui.confirm → Promise"
             onClick={() => handleEventButtonClick("embedded::ui.confirm")}
-          />
-        </div>
-      </section>
-
-      {/* Checkout & Logging */}
-      <section className="event-section">
-        <h3 className="section-title">
-          <ShoppingBag size={16} />
-          Checkout & Logging
-        </h3>
-        <div className="button-grid">
-          <Button
-            event
-            variant="accent"
-            label="Create Checkout"
-            hint="checkout.create"
-            onClick={() => handleEventButtonClick("embedded::checkout.create")}
-            disabled
-          />
-          <Button
-            event
-            label="Send Log"
-            hint="log"
-            onClick={() => handleEventButtonClick("embedded::log")}
           />
         </div>
       </section>

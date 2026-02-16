@@ -1,9 +1,6 @@
-LOCAL_NOTES.md
 node_modules
 dist
-
-#Ignore cursor AI rules
 .cursor/rules/codacy.mdc
-
-# Local Netlify folder
 .netlify
+/coverage
+.env

@@ -139,7 +139,6 @@ const EmbeddedEvents = {
     description: "Set primary action button in navigation bar",
     payload: {
       title: "Add Product",
-      onClick: true,
       value: "create",
       subTitle: "Create a new product",
       icon: "sicon-add",
@@ -151,7 +150,6 @@ const EmbeddedEvents = {
     },
     configurable: [
       "title",
-      "onClick",
       "value",
       "subTitle",
       "icon",
@@ -166,9 +164,7 @@ const EmbeddedEvents = {
   "embedded::nav.clearAction": {
     category: "nav",
     description: "Clear primary action button",
-    payload: {
-      title: "",
-    },
+    payload: {},
   },
 
   // ============================================
@@ -254,33 +250,6 @@ const EmbeddedEvents = {
   },
 
   /**
-   * Open modal
-   */
-  "embedded::ui.modal-open": {
-    category: "ui",
-    description: "Open a modal dialog",
-    payload: {
-      action: "open",
-      id: "confirm-dialog",
-      content: { title: "Confirm Action", body: "Are you sure?" },
-    },
-    configurable: ["id", "content"],
-  },
-
-  /**
-   * Close modal
-   */
-  "embedded::ui.modal-close": {
-    category: "ui",
-    description: "Close a modal dialog",
-    payload: {
-      action: "close",
-      id: "confirm-dialog",
-    },
-    configurable: ["id"],
-  },
-
-  /**
    * Confirm dialog (async)
    * Returns a Promise with the user's choice
    */
@@ -304,41 +273,14 @@ const EmbeddedEvents = {
   // ============================================
 
   /**
-   * Create checkout
+   * Get available addons for the app
+   * Note: Use the Addons tab to test checkout flow with real addons
    */
-  "embedded::checkout.create": {
+  "embedded::checkout.getAddons": {
     category: "checkout",
-    description: "Initiate checkout process",
-    payload: {
-      checkoutId: "CHK_" + Date.now(),
-      amount: 299.99,
-      currency: "SAR",
-      items: [
-        { id: "PROD_001", name: "Test Product", quantity: 1, price: 299.99 },
-      ],
-    },
-    configurable: ["checkoutId", "amount", "currency", "items"],
-  },
-
-  // ============================================
-  // Logging Events
-  // ============================================
-
-  /**
-   * Send log message
-   */
-  "embedded::log": {
-    category: "log",
-    description: "Send log message to host",
-    payload: {
-      level: "info",
-      message: "Test log message from embedded app",
-      context: {
-        component: "TestConsole",
-        action: "test-logging",
-      },
-    },
-    configurable: ["level", "message", "context"],
+    description: "Fetch available addons for the app (cached on host)",
+    payload: {},
+    async: true,
   },
 };
 
@@ -363,7 +305,7 @@ const IncomingEvents = {
 
   "embedded::nav.actionClick": {
     description: "Primary action button was clicked by user",
-    expectedFields: ["url", "value"],
+    expectedFields: ["value"],
   },
 
   "embedded::ui.confirm.response": {
@@ -371,9 +313,21 @@ const IncomingEvents = {
     expectedFields: ["requestId", "confirmed"],
   },
 
-  "embedded::ui.modal.response": {
-    description: "Response to modal request",
-    expectedFields: ["requestId", "result", "error"],
+  "embedded::checkout.response": {
+    description: "Checkout result from host",
+    expectedFields: [
+      "success",
+      "status",
+      "order_id",
+      "error",
+      "context",
+      "message",
+    ],
+  },
+
+  "embedded::checkout.getAddons.response": {
+    description: "Available addons list from host",
+    expectedFields: ["success", "addons", "error"],
   },
 };
 

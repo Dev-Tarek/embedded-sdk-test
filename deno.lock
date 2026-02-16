@@ -11,10 +11,27 @@
   "workspace": {
     "packageJson": {
       "dependencies": [
-        "npm:@salla.sa/embedded-sdk@0.1.0-beta.2",
+        "npm:@monaco-editor/react@^4.7.0",
+        "npm:@salla.sa/embedded-sdk@0.2.3",
+        "npm:@testing-library/jest-dom@^6.6.3",
+        "npm:@testing-library/react@^16.1.0",
+        "npm:@testing-library/user-event@^14.5.2",
+        "npm:@vitejs/plugin-react@^5.1.2",
+        "npm:@vitest/coverage-v8@^2.1.8",
+        "npm:eslint-plugin-react-hooks@^5.2.0",
+        "npm:eslint-plugin-react-refresh@~0.4.26",
+        "npm:eslint-plugin-react@^7.37.5",
+        "npm:eslint-plugin-unused-imports@^4.3.0",
+        "npm:eslint@^8.57.1",
+        "npm:jsdom@^25.0.1",
+        "npm:lucide-react@0.562",
+        "npm:monaco-editor@~0.55.1",
         "npm:netlify-cli@^23.13.0",
         "npm:prettier@^3.7.4",
-        "npm:vite@5.4.17"
+        "npm:react-dom@^19.2.3",
+        "npm:react@^19.2.3",
+        "npm:vite@5.4.17",
+        "npm:vitest@^2.1.8"
       ]
     }
   }
