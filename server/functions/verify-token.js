@@ -1,5 +1,5 @@
 /**
- * Netlify Serverless Function - Token Verification
+ * Serverless Function - Token Verification
  *
  * This function handles token verification by proxying the request
  * to the Salla exchange authority service.
@@ -11,7 +11,7 @@ const VERIFY_API_URLS = {
   prod: "https://api.salla.dev/exchange-authority/v1/verify",
 };
 
-exports.handler = async (event, context) => {
+exports.handler = async (event, _context) => {
   // Only allow POST requests
   if (event.httpMethod !== "POST") {
     return {
@@ -23,12 +23,15 @@ exports.handler = async (event, context) => {
   try {
     // Parse request body
     const body = JSON.parse(event.body || "{}");
-    const { token, iss, subject, env, appId } = body;
+    const { token, iss, subject, appId } = body;
 
     // Validate required fields
+    const jsonHeaders = { "Content-Type": "application/json" };
+
     if (!token) {
       return {
         statusCode: 400,
+        headers: jsonHeaders,
         body: JSON.stringify({ success: false, error: "Token is required" }),
       };
     }
@@ -37,19 +40,20 @@ exports.handler = async (event, context) => {
     if (!appId) {
       return {
         statusCode: 400,
+        headers: jsonHeaders,
         body: JSON.stringify({ success: false, error: "App ID is required" }),
       };
     }
 
-    // Determine environment (default to 'dev')
-    // const environment = env || "dev";
-    const environment = process.env.ENV;
+    // Determine environment (default to 'dev' when ENV is not set, e.g. local netlify dev)
+    const environment = process.env.ENV || "dev";
 
     // Get API URL based on environment
     const apiUrl = VERIFY_API_URLS[environment];
     if (!apiUrl) {
       return {
         statusCode: 400,
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           success: false,
           error: `Invalid environment: ${environment}. Must be 'dev' or 'prod'`,
@@ -101,6 +105,7 @@ exports.handler = async (event, context) => {
     console.error("Token verification error:", error);
     return {
       statusCode: 500,
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         success: false,
         error: error.message || "Internal server error",

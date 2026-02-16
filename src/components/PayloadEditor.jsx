@@ -9,7 +9,7 @@ export default function PayloadEditor({
 }) {
   const [payload, setPayload] = useState(
     initialPayload ||
-      JSON.stringify({ event: "embedded::iframe.ready", height: 600 }, null, 2)
+      JSON.stringify({ event: "embedded::iframe.ready", height: 600 }, null, 2),
   );
 
   // Update payload when event is clicked

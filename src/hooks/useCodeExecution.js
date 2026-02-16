@@ -16,7 +16,7 @@ function stripConsoleStyles(...args) {
   if (styleCount === 0) {
     return args
       .map((a) =>
-        typeof a === "object" ? JSON.stringify(a, null, 2) : String(a)
+        typeof a === "object" ? JSON.stringify(a, null, 2) : String(a),
       )
       .join(" ");
   }
@@ -29,7 +29,7 @@ function stripConsoleStyles(...args) {
 
   // Combine cleaned format with remaining message args
   const parts = [cleanedFormat, ...messageArgs].map((a) =>
-    typeof a === "object" ? JSON.stringify(a, null, 2) : String(a)
+    typeof a === "object" ? JSON.stringify(a, null, 2) : String(a),
   );
 
   return parts.join(" ");
