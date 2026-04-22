@@ -34,18 +34,6 @@ const EmbeddedEvents = {
     payload: {},
   },
 
-  /**
-   * Request iframe resize
-   */
-  "embedded::iframe.resize": {
-    category: "iframe",
-    description: "Request iframe height change",
-    payload: {
-      height: 800,
-    },
-    configurable: ["height"],
-  },
-
   // ============================================
   // Authentication Events
   // ============================================
@@ -172,81 +160,29 @@ const EmbeddedEvents = {
   // ============================================
 
   /**
-   * Show loading indicator
+   * Set loading state
    */
-  "embedded::ui.loading-show": {
+  "embedded::ui.loading": {
     category: "ui",
-    description: "Show loading indicator (content not ready)",
+    description: "Set loading state in host",
     payload: {
       action: "show",
     },
+    configurable: ["action"],
   },
 
   /**
-   * Hide loading indicator
+   * Show toast notification
    */
-  "embedded::ui.loading-hide": {
+  "embedded::ui.toast": {
     category: "ui",
-    description: "Hide loading indicator (content ready)",
-    payload: {
-      action: "hide",
-    },
-  },
-
-  /**
-   * Show success toast
-   */
-  "embedded::ui.toast-success": {
-    category: "ui",
-    description: "Show success toast notification",
+    description: "Show toast notification",
     payload: {
       type: "success",
       message: "Operation completed successfully!",
       duration: 3000,
     },
-    configurable: ["message", "duration"],
-  },
-
-  /**
-   * Show error toast
-   */
-  "embedded::ui.toast-error": {
-    category: "ui",
-    description: "Show error toast notification",
-    payload: {
-      type: "error",
-      message: "Something went wrong!",
-      duration: 5000,
-    },
-    configurable: ["message", "duration"],
-  },
-
-  /**
-   * Show warning toast
-   */
-  "embedded::ui.toast-warning": {
-    category: "ui",
-    description: "Show warning toast notification",
-    payload: {
-      type: "warning",
-      message: "Please review your input",
-      duration: 4000,
-    },
-    configurable: ["message", "duration"],
-  },
-
-  /**
-   * Show info toast
-   */
-  "embedded::ui.toast-info": {
-    category: "ui",
-    description: "Show info toast notification",
-    payload: {
-      type: "info",
-      message: "New features available",
-      duration: 3000,
-    },
-    configurable: ["message", "duration"],
+    configurable: ["type", "message", "duration"],
   },
 
   /**
