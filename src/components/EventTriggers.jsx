@@ -1,7 +1,6 @@
 import { EmbeddedEvents } from "../utils/eventDefinitions.js";
 import { Clock, Lock, Home, Menu, Grid3x3, Bell, Square } from "lucide-react";
 import Button from "./forms/Button.jsx";
-import logger from "../utils/logger.js";
 
 export default function EventTriggers({
   onEventClick,
@@ -9,7 +8,17 @@ export default function EventTriggers({
   logMessage,
   showToast,
   bootstrap,
+  onAddDynamicItem,
+  onUpdateLatestDynamicItem,
+  onRemoveLatestDynamicItem,
 }) {
+  // Build a payload once and dispatch through the same path as
+  // handleEventButtonClick. Used by buttons whose payload is fixed inline.
+  const fire = (eventName, payload) => {
+    if (onEventClick) onEventClick(eventName, payload);
+    return sendSdkEvent(eventName, payload);
+  };
+
   const handleEventButtonClick = async (eventName) => {
     const eventDef = EmbeddedEvents[eventName];
 
@@ -124,6 +133,57 @@ export default function EventTriggers({
           embedded.nav.clearAction();
           break;
 
+        case "embedded::nav.addItem": {
+          showToast("Calling nav.addNavItem()…", "info");
+          try {
+            if (!onAddDynamicItem)
+              throw new Error("Add item handler is missing");
+            const result = await onAddDynamicItem();
+            showToast(
+              `Added navbar item. ID: ${result.id || "none"}`,
+              "success",
+            );
+            logMessage("incoming", {
+              event: "embedded::nav.addItem.response",
+              item: result,
+            });
+          } catch (err) {
+            showToast(`addNavItem failed: ${err.message}`, "error");
+            logMessage(
+              "outgoing",
+              { event: eventName, ...payload },
+              err.message,
+            );
+          }
+          break;
+        }
+
+        case "embedded::nav.updateItem": {
+          try {
+            if (!onUpdateLatestDynamicItem) {
+              throw new Error("Update item handler is missing");
+            }
+            const latest = await onUpdateLatestDynamicItem();
+            showToast(`nav.updateNavItem: ${latest.id}`, "success");
+          } catch (err) {
+            showToast(`updateNavItem failed: ${err.message}`, "error");
+          }
+          break;
+        }
+
+        case "embedded::nav.removeItem": {
+          try {
+            if (!onRemoveLatestDynamicItem) {
+              throw new Error("Remove item handler is missing");
+            }
+            const latest = await onRemoveLatestDynamicItem();
+            showToast(`nav.removeNavItem: ${latest.id}`, "success");
+          } catch (err) {
+            showToast(`removeNavItem failed: ${err.message}`, "warning");
+          }
+          break;
+        }
+
         case "embedded::ui.loading":
           embedded.ui.toast.info(
             "Loading event sent. You should call embedded.ui.loading.hide() to re-show the App. This test App will automatically hide loading after 10 seconds",
@@ -135,6 +195,14 @@ export default function EventTriggers({
             }, 10000);
           } else {
             embedded.ui.loading.hide();
+          }
+          break;
+
+        case "embedded::ui.breadcrumbs":
+          if (payload.action === "hide") {
+            embedded.ui.breadcrumbs.hide();
+          } else {
+            embedded.ui.breadcrumbs.show();
           }
           break;
 
@@ -290,6 +358,24 @@ export default function EventTriggers({
             hint="nav.clearAction"
             onClick={() => handleEventButtonClick("embedded::nav.clearAction")}
           />
+          <Button
+            event
+            label="Add item"
+            hint="nav.addNavItem (async)"
+            onClick={() => handleEventButtonClick("embedded::nav.addItem")}
+          />
+          <Button
+            event
+            label="Update item"
+            hint="nav.updateNavItem"
+            onClick={() => handleEventButtonClick("embedded::nav.updateItem")}
+          />
+          <Button
+            event
+            label="Remove item"
+            hint="nav.removeNavItem"
+            onClick={() => handleEventButtonClick("embedded::nav.removeItem")}
+          />
         </div>
       </section>
 
@@ -304,19 +390,25 @@ export default function EventTriggers({
             event
             label="Loading On"
             hint="ui.loading (show)"
-            onClick={() => {
-              onEventClick?.("embedded::ui.loading", { action: "show" });
-              sendSdkEvent("embedded::ui.loading", { action: "show" });
-            }}
+            onClick={() => fire("embedded::ui.loading", { action: "show" })}
           />
           <Button
             event
             label="Loading Off"
             hint="ui.loading (hide)"
-            onClick={() => {
-              onEventClick?.("embedded::ui.loading", { action: "hide" });
-              sendSdkEvent("embedded::ui.loading", { action: "hide" });
-            }}
+            onClick={() => fire("embedded::ui.loading", { action: "hide" })}
+          />
+          <Button
+            event
+            label="Breadcrumbs Show"
+            hint="ui.breadcrumbs (show)"
+            onClick={() => fire("embedded::ui.breadcrumbs", { action: "show" })}
+          />
+          <Button
+            event
+            label="Breadcrumbs Hide"
+            hint="ui.breadcrumbs (hide)"
+            onClick={() => fire("embedded::ui.breadcrumbs", { action: "hide" })}
           />
         </div>
       </section>
@@ -333,72 +425,52 @@ export default function EventTriggers({
             variant="success"
             label="Success"
             hint="ui.toast (success)"
-            onClick={() => {
-              onEventClick?.("embedded::ui.toast", {
+            onClick={() =>
+              fire("embedded::ui.toast", {
                 type: "success",
                 message: "Operation completed successfully!",
                 duration: 3000,
-              });
-              sendSdkEvent("embedded::ui.toast", {
-                type: "success",
-                message: "Operation completed successfully!",
-                duration: 3000,
-              });
-            }}
+              })
+            }
           />
           <Button
             event
             variant="danger"
             label="Error"
             hint="ui.toast (error)"
-            onClick={() => {
-              onEventClick?.("embedded::ui.toast", {
+            onClick={() =>
+              fire("embedded::ui.toast", {
                 type: "error",
                 message: "Something went wrong!",
                 duration: 5000,
-              });
-              sendSdkEvent("embedded::ui.toast", {
-                type: "error",
-                message: "Something went wrong!",
-                duration: 5000,
-              });
-            }}
+              })
+            }
           />
           <Button
             event
             variant="warning"
             label="Warning"
             hint="ui.toast (warning)"
-            onClick={() => {
-              onEventClick?.("embedded::ui.toast", {
+            onClick={() =>
+              fire("embedded::ui.toast", {
                 type: "warning",
                 message: "Please review your input",
                 duration: 4000,
-              });
-              sendSdkEvent("embedded::ui.toast", {
-                type: "warning",
-                message: "Please review your input",
-                duration: 4000,
-              });
-            }}
+              })
+            }
           />
           <Button
             event
             variant="info"
             label="Info"
             hint="ui.toast (info)"
-            onClick={() => {
-              onEventClick?.("embedded::ui.toast", {
+            onClick={() =>
+              fire("embedded::ui.toast", {
                 type: "info",
                 message: "New features available",
                 duration: 3000,
-              });
-              sendSdkEvent("embedded::ui.toast", {
-                type: "info",
-                message: "New features available",
-                duration: 3000,
-              });
-            }}
+              })
+            }
           />
         </div>
       </section>

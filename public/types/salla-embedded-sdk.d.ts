@@ -53,6 +53,20 @@ export declare interface AuthModule {
 }
 
 /**
+ * Breadcrumbs sub-module interface.
+ */
+declare interface BreadcrumbsSubModule {
+  /**
+   * Hide host breadcrumbs container.
+   */
+  hide(): void;
+  /**
+   * Show host breadcrumbs container.
+   */
+  show(): void;
+}
+
+/**
  * Optional configuration for checkout creation.
  */
 export declare interface CheckoutCreateConfig {
@@ -149,6 +163,11 @@ export declare interface CheckoutModule {
    * Called automatically by EmbeddedApp.destroy().
    */
   destroy(): void;
+  /**
+   * Reset the checkout cache on the host side.
+   * Useful when page is refreshed or app state changes.
+   */
+  resetCache(): void;
 }
 
 /**
@@ -371,6 +390,8 @@ declare interface IntrospectResponseData {
 declare interface LayoutInfo {
   /** Current theme */
   theme: Theme;
+  /** Text direction */
+  dir: "ltr" | "rtl";
   /** Parent window width */
   width: number;
   /** Current locale */
@@ -405,6 +426,38 @@ declare interface LoadingSubModule {
   hide(): void;
 }
 
+/** Result of addItem promise */
+declare interface NavItemAddResult {
+  id: string;
+  value: string;
+}
+
+/** Callback when injected nav item is clicked */
+declare type NavItemClickCallback = (payload: {
+  id: string;
+  value: string;
+  url: string;
+}) => void;
+
+/** Input for injecting one host sub-navigation item */
+declare interface NavItemInput {
+  title: string;
+  value: string;
+  url: string;
+  disabled?: boolean;
+  active?: boolean;
+}
+
+/** Patch for an injected item (identified by opaque id from addItem response) */
+declare interface NavItemPatchInput {
+  id: string;
+  title?: string;
+  value?: string;
+  url?: string;
+  disabled?: boolean;
+  active?: boolean;
+}
+
 /**
  * Nav module interface.
  */
@@ -432,15 +485,6 @@ export declare interface NavModule {
    *     { title: 'Export', value: 'export' },
    *   ]
    * });
-   *
-   * // Handle clicks via onActionClick
-   * embedded.nav.onActionClick((value) => {
-   *   if (value === 'create-product') {
-   *     openCreateForm();
-   *   } else if (value === 'import') {
-   *     embedded.page.navigate('/import');
-   *   }
-   * });
    * ```
    */
   setAction(config: PrimaryActionConfig): void;
@@ -463,20 +507,65 @@ export declare interface NavModule {
    * ```typescript
    * const unsubscribe = embedded.nav.onActionClick((value) => {
    *   switch (value) {
-   *     case 'save':
-   *       handleSave();
-   *       break;
-   *     case 'export':
-   *       handleExport();
-   *       break;
-   *     case 'settings':
-   *       embedded.page.navigate('/settings');
-   *       break;
+   *     case 'save':    handleSave(); break;
+   *     case 'export':  handleExport(); break;
+   *     case 'settings': embedded.page.navigate('/settings'); break;
    *   }
    * });
    * ```
    */
   onActionClick(callback: ActionClickCallback): Unsubscribe;
+  /**
+   * Inject one sub-navigation item beside API-driven items. Resolves with an
+   * opaque `id` you must keep if you intend to update or remove the item later.
+   * Rejects after 2s if the host does not acknowledge.
+   *
+   * @example
+   * ```typescript
+   * const tab = await embedded.nav.addNavItem({
+   *   title: 'Reports',
+   *   value: 'reports',
+   *   url: '/apps/installed/my-app/reports',
+   * });
+   * console.log(tab.id);   // opaque id, store it
+   * ```
+   */
+  addNavItem(item: NavItemInput): Promise<NavItemAddResult>;
+  /**
+   * Patch a previously injected item — disable, rename, mark active, etc.
+   * Unknown ids are silently ignored by the host.
+   *
+   * @example
+   * ```typescript
+   * embedded.nav.updateNavItem({ id: tab.id, disabled: true });
+   * embedded.nav.updateNavItem({ id: tab.id, title: 'Updated title' });
+   * ```
+   */
+  updateNavItem(item: NavItemPatchInput): void;
+  /**
+   * Remove an injected item by its opaque id (unknown ids are ignored).
+   *
+   * @example
+   * ```typescript
+   * embedded.nav.removeNavItem(tab.id);
+   * ```
+   */
+  removeNavItem(id: string): void;
+  /**
+   * Subscribe to clicks on injected sub-nav items from the merchant dashboard chrome.
+   *
+   * @example
+   * ```typescript
+   * const unsubscribe = embedded.nav.onNavItemClick(({ id, value, url }) => {
+   *   console.log('clicked tab', value, '->', url);
+   * });
+   * ```
+   */
+  onNavItemClick(callback: NavItemClickCallback): Unsubscribe;
+  /**
+   * Tear down listeners (called by EmbeddedApp.destroy).
+   */
+  destroy(): void;
 }
 
 /**
@@ -657,6 +746,10 @@ export declare interface UIModule {
    * Loading state control.
    */
   loading: LoadingSubModule;
+  /**
+   * Breadcrumbs visibility control.
+   */
+  breadcrumbs: BreadcrumbsSubModule;
   /**
    * Toast notifications.
    */

@@ -11,6 +11,7 @@ const mockEmbedded = {
   ui: {
     toast: { error: vi.fn(), info: vi.fn(), show: vi.fn() },
     loading: { show: vi.fn(), hide: vi.fn() },
+    breadcrumbs: { show: vi.fn(), hide: vi.fn() },
     confirm: vi.fn(),
   },
 };
@@ -72,6 +73,22 @@ describe("EventTriggers", () => {
     expect(mockEmbedded.ui.toast.show).toHaveBeenCalledWith(
       expect.objectContaining({ type: "success" }),
     );
+  });
+
+  it("ui.breadcrumbs show triggers breadcrumbs.show", async () => {
+    render(<EventTriggers {...defaultProps} />);
+    await userEvent.click(
+      screen.getByRole("button", { name: /Breadcrumbs Show/i }),
+    );
+    expect(mockEmbedded.ui.breadcrumbs.show).toHaveBeenCalled();
+  });
+
+  it("ui.breadcrumbs hide triggers breadcrumbs.hide", async () => {
+    render(<EventTriggers {...defaultProps} />);
+    await userEvent.click(
+      screen.getByRole("button", { name: /Breadcrumbs Hide/i }),
+    );
+    expect(mockEmbedded.ui.breadcrumbs.hide).toHaveBeenCalled();
   });
 
   it("ui.confirm success shows toast with result", async () => {
