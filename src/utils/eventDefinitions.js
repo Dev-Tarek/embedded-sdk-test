@@ -155,6 +155,55 @@ const EmbeddedEvents = {
     payload: {},
   },
 
+  /**
+   * Add one host navbar item (opaque id returned via addItem.response)
+   */
+  "embedded::nav.addItem": {
+    category: "nav",
+    description:
+      "Add a dynamic item (Added Item {n}) to merchant dashboard navbar",
+    async: true,
+    payload: {
+      item: {
+        title: "Added Item 1",
+        value: "added-item-1",
+        url: "/apps/installed",
+        disabled: false,
+        active: false,
+      },
+    },
+    configurable: ["item"],
+  },
+
+  /**
+   * Update injected item (requires id from addNavItem response)
+   */
+  "embedded::nav.updateItem": {
+    category: "nav",
+    description: "Rename most recently added item to Updated Item {n}",
+    payload: {
+      item: {
+        id: "REPLACE_WITH_ID_FROM_RESPONSE",
+        title: "Updated Item 1",
+      },
+    },
+    configurable: ["item"],
+  },
+
+  /**
+   * Remove injected items by opaque id (host ignores unknown ids)
+   */
+  "embedded::nav.removeItem": {
+    category: "nav",
+    description: "Remove most recently added dynamic item (LIFO)",
+    payload: {
+      id: "",
+    },
+    configurable: ["id"],
+    warning:
+      "Runtime behavior always removes the most recently added item tracked by the app.",
+  },
+
   // ============================================
   // UI Events
   // ============================================
@@ -165,6 +214,18 @@ const EmbeddedEvents = {
   "embedded::ui.loading": {
     category: "ui",
     description: "Set loading state in host",
+    payload: {
+      action: "show",
+    },
+    configurable: ["action"],
+  },
+
+  /**
+   * Set breadcrumbs visibility in host shell
+   */
+  "embedded::ui.breadcrumbs": {
+    category: "ui",
+    description: "Show or hide host breadcrumbs container",
     payload: {
       action: "show",
     },
@@ -242,6 +303,16 @@ const IncomingEvents = {
   "embedded::nav.actionClick": {
     description: "Primary action button was clicked by user",
     expectedFields: ["value"],
+  },
+
+  "embedded::nav.itemClick": {
+    description: "Clicked an injected dashboard navbar item",
+    expectedFields: ["id", "value", "url"],
+  },
+
+  "embedded::nav.addItem.response": {
+    description: "Ack for nav.addNavItem with generated opaque id",
+    expectedFields: ["item"],
   },
 
   "embedded::ui.confirm.response": {
