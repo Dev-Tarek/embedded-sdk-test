@@ -40,9 +40,7 @@ export function useNavSync({ embedded, isReady, setActiveTab, activeTab }) {
     return () => {
       unsubscribeRef.current();
       unsubscribeRef.current = () => {};
-      // Best-effort: remove items injected by this hook. Host also clears its
-      // own injection store on iframe.destroy, but this keeps the test-kit
-      // honest as a reference for app developers.
+      // remove items injected by this hook.
       const removeIds = [
         ...Object.values(staticItemIdsByValueRef.current),
         ...addedItemsRef.current.map((row) => row.id),
@@ -54,6 +52,8 @@ export function useNavSync({ embedded, isReady, setActiveTab, activeTab }) {
           /* no-op */
         }
       });
+      staticItemIdsByValueRef.current = {};
+      bootstrapStateRef.current = "idle";
     };
   }, [nav]);
 
