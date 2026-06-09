@@ -53,6 +53,20 @@ export declare interface AuthModule {
 }
 
 /**
+ * Breadcrumbs sub-module interface.
+ */
+declare interface BreadcrumbsSubModule {
+  /**
+   * Hide host breadcrumbs container.
+   */
+  hide(): void;
+  /**
+   * Show host breadcrumbs container.
+   */
+  show(): void;
+}
+
+/**
  * Optional configuration for checkout creation.
  */
 export declare interface CheckoutCreateConfig {
@@ -149,6 +163,11 @@ export declare interface CheckoutModule {
    * Called automatically by EmbeddedApp.destroy().
    */
   destroy(): void;
+  /**
+   * Reset the checkout cache on the host side.
+   * Useful when page is refreshed or app state changes.
+   */
+  resetCache(): void;
 }
 
 /**
@@ -371,6 +390,8 @@ declare interface IntrospectResponseData {
 declare interface LayoutInfo {
   /** Current theme */
   theme: Theme;
+  /** Text direction */
+  dir: "ltr" | "rtl";
   /** Parent window width */
   width: number;
   /** Current locale */
@@ -405,6 +426,69 @@ declare interface LoadingSubModule {
   hide(): void;
 }
 
+/** Result of addItem promise */
+declare interface NavItemAddResult {
+  value: string;
+  /**
+   * @deprecated Same string as `value`. Prefer `value` for update/remove/click handling.
+   */
+  id: string;
+}
+
+/**
+ * One submenu row; must not include nested `children`.
+ */
+export declare interface NavItemChildInput {
+  title: string;
+  value: string;
+  url: string;
+  disabled?: boolean;
+  active?: boolean;
+}
+
+/** Callback when injected nav item is clicked */
+declare type NavItemClickCallback = (payload: {
+  value: string;
+  url: string;
+  /**
+   * @deprecated Same string as `value`.
+   */
+  id: string;
+}) => void;
+
+/** @alias NavItemNodeInput — root add payload */
+export declare type NavItemInput = NavItemNodeInput;
+
+/**
+ * Sub-navigation node injected into the host sub-nav.
+ * Optional `children` renders as a single hover/click dropdown level (host UI).
+ * Nested children under a child are not supported.
+ */
+export declare interface NavItemNodeInput {
+  title: string;
+  value: string;
+  url: string;
+  disabled?: boolean;
+  active?: boolean;
+  /** One level of submenu items only; must not contain further `children`. */
+  children?: NavItemChildInput[];
+}
+
+/**
+ * Patch for an injected parent or child row.
+ * Identified by `value` (immutable). Optional `children` replaces the full
+ * dropdown list when patching a parent; ignored for child rows.
+ */
+declare interface NavItemPatchInput {
+  value: string;
+  title?: string;
+  url?: string;
+  disabled?: boolean;
+  active?: boolean;
+  /** Parent only: replaces entire children list when set. */
+  children?: NavItemChildInput[];
+}
+
 /**
  * Nav module interface.
  */
@@ -432,15 +516,6 @@ export declare interface NavModule {
    *     { title: 'Export', value: 'export' },
    *   ]
    * });
-   *
-   * // Handle clicks via onActionClick
-   * embedded.nav.onActionClick((value) => {
-   *   if (value === 'create-product') {
-   *     openCreateForm();
-   *   } else if (value === 'import') {
-   *     embedded.page.navigate('/import');
-   *   }
-   * });
    * ```
    */
   setAction(config: PrimaryActionConfig): void;
@@ -463,20 +538,66 @@ export declare interface NavModule {
    * ```typescript
    * const unsubscribe = embedded.nav.onActionClick((value) => {
    *   switch (value) {
-   *     case 'save':
-   *       handleSave();
-   *       break;
-   *     case 'export':
-   *       handleExport();
-   *       break;
-   *     case 'settings':
-   *       embedded.page.navigate('/settings');
-   *       break;
+   *     case 'save':    handleSave(); break;
+   *     case 'export':  handleExport(); break;
+   *     case 'settings': embedded.page.navigate('/settings'); break;
    *   }
    * });
    * ```
    */
   onActionClick(callback: ActionClickCallback): Unsubscribe;
+  /**
+   * Inject one sub-navigation item beside API-driven items. Resolves with the
+   * item's `value` (and deprecated `id` equal to `value`). Rejects after 2s if
+   * the host does not acknowledge.
+   *
+   * @example
+   * ```typescript
+   * const tab = await embedded.nav.addNavItem({
+   *   title: 'Reports',
+   *   value: 'reports',
+   *   url: '/apps/installed/my-app/reports',
+   * });
+   * console.log(tab.value);   // use for update/remove
+   * ```
+   */
+  addNavItem(item: NavItemInput): Promise<NavItemAddResult>;
+  /**
+   * Patch a previously injected parent or child by `value` (unknown values are
+   * ignored by the host). Optional `children` on a parent replaces the full list.
+   *
+   * @example
+   * ```typescript
+   * embedded.nav.updateNavItem({ value: 'reports', disabled: true });
+   * embedded.nav.updateNavItem({ value: 'reports', title: 'Updated title' });
+   * ```
+   */
+  updateNavItem(item: NavItemPatchInput): void;
+  /**
+   * Remove an injected parent or child by its `value` (unknown values are ignored).
+   * Removing a parent removes its children.
+   *
+   * @example
+   * ```typescript
+   * embedded.nav.removeNavItem('reports');
+   * ```
+   */
+  removeNavItem(value: string): void;
+  /**
+   * Subscribe to clicks on injected sub-nav items from the merchant dashboard chrome.
+   *
+   * @example
+   * ```typescript
+   * const unsubscribe = embedded.nav.onNavItemClick(({ value, url }) => {
+   *   console.log('clicked tab', value, '->', url);
+   * });
+   * ```
+   */
+  onNavItemClick(callback: NavItemClickCallback): Unsubscribe;
+  /**
+   * Tear down listeners (called by EmbeddedApp.destroy).
+   */
+  destroy(): void;
 }
 
 /**
@@ -657,6 +778,10 @@ export declare interface UIModule {
    * Loading state control.
    */
   loading: LoadingSubModule;
+  /**
+   * Breadcrumbs visibility control.
+   */
+  breadcrumbs: BreadcrumbsSubModule;
   /**
    * Toast notifications.
    */

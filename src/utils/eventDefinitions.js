@@ -155,6 +155,56 @@ const EmbeddedEvents = {
     payload: {},
   },
 
+  /**
+   * Add one host sub-nav item (`value` is the stable key; response echoes deprecated `id` === `value`).
+   * Optional one-level `item.children` for a dropdown.
+   */
+  "embedded::nav.addItem": {
+    category: "nav",
+    description:
+      "Add a dynamic sub-nav item (Added Item {n}); optional children[] for one submenu level",
+    async: true,
+    payload: {
+      item: {
+        title: "Added Item 1",
+        value: "added-item-1",
+        url: "/apps/installed",
+        disabled: false,
+        active: false,
+      },
+    },
+    configurable: ["item"],
+  },
+
+  /**
+   * Update injected parent or child by `value` (immutable key)
+   */
+  "embedded::nav.updateItem": {
+    category: "nav",
+    description: "Rename most recently added item to Updated Item {n}",
+    payload: {
+      item: {
+        value: "REPLACE_WITH_VALUE_FROM_RESPONSE",
+        title: "Updated Item 1",
+      },
+    },
+    configurable: ["item"],
+  },
+
+  /**
+   * Remove injected items by `value` (host ignores unknown values)
+   */
+  "embedded::nav.removeItem": {
+    category: "nav",
+    description: "Remove most recently added dynamic item (LIFO)",
+    payload: {
+      value: "",
+    },
+    configurable: ["value"],
+    warning:
+      "Runtime behavior always removes the most recently added item tracked by the app.",
+  },
+
   // ============================================
   // UI Events
   // ============================================
@@ -165,6 +215,18 @@ const EmbeddedEvents = {
   "embedded::ui.loading": {
     category: "ui",
     description: "Set loading state in host",
+    payload: {
+      action: "show",
+    },
+    configurable: ["action"],
+  },
+
+  /**
+   * Set breadcrumbs visibility in host shell
+   */
+  "embedded::ui.breadcrumbs": {
+    category: "ui",
+    description: "Show or hide host breadcrumbs container",
     payload: {
       action: "show",
     },
@@ -242,6 +304,17 @@ const IncomingEvents = {
   "embedded::nav.actionClick": {
     description: "Primary action button was clicked by user",
     expectedFields: ["value"],
+  },
+
+  "embedded::nav.itemClick": {
+    description: "Clicked an injected dashboard navbar item",
+    expectedFields: ["value", "url", "id"],
+  },
+
+  "embedded::nav.addItem.response": {
+    description:
+      "Ack for nav.addNavItem with `item.value` and deprecated `item.id` (same string)",
+    expectedFields: ["item"],
   },
 
   "embedded::ui.confirm.response": {
