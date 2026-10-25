@@ -55,7 +55,7 @@ pnpm dev:worker
 
 # Log in to Cloudflare (once), then build and deploy
 npx wrangler login
-pnpm deploy
+pnpm run deploy
 ```
 
 Use the deployed `*.workers.dev` URL as the embedded page URL of your test app in Salla Partners.
