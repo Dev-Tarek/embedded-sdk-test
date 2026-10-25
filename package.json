@@ -8,9 +8,10 @@
     "sync-types": "node scripts/sync-types.js",
     "prebuild": "rm -rf dist && npm run sync-types",
     "dev": "pnpm prebuild && vite",
-    "dev:netlify": "netlify dev",
+    "dev:worker": "pnpm build && wrangler dev",
     "build": "pnpm prebuild && vite build",
     "preview": "vite preview",
+    "deploy": "pnpm build && wrangler deploy",
     "test": "vitest run --coverage",
     "test:watch": "vitest watch",
     "lint": "eslint .",
@@ -35,10 +36,10 @@
     "eslint-plugin-react-refresh": "^0.4.26",
     "eslint-plugin-unused-imports": "^4.3.0",
     "jsdom": "^25.0.1",
-    "netlify-cli": "^23.13.0",
     "prettier": "^3.7.4",
     "vite": "5.4.17",
-    "vitest": "^2.1.8"
+    "vitest": "^2.1.8",
+    "wrangler": "^4.152.0"
   },
   "dependencies": {
     "@monaco-editor/react": "^4.7.0",
