@@ -12,8 +12,8 @@ importers:
         specifier: ^4.7.0
         version: 4.7.0(monaco-editor@0.55.1)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
       '@salla.sa/embedded-sdk':
-        specifier: file:vendor/salla.sa-embedded-sdk-0.3.0-checkout.ef676ce.tgz
-        version: file:vendor/salla.sa-embedded-sdk-0.3.0-checkout.ef676ce.tgz
+        specifier: file:vendor/salla.sa-embedded-sdk-0.2.7.tgz
+        version: file:vendor/salla.sa-embedded-sdk-0.2.7.tgz
       lucide-react:
         specifier: ^0.562.0
         version: 0.562.0(react@19.2.5)
@@ -914,9 +914,9 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@salla.sa/embedded-sdk@file:vendor/salla.sa-embedded-sdk-0.3.0-checkout.ef676ce.tgz':
-    resolution: {integrity: sha512-Qxr9N4CXzY+dbXcxnYvFoXpEvaoGk+am5DPbs7aqZxxmgM6Apa+KkGE63ptfydrkOxrcsJnUMQwKIMvD76Imkg==, tarball: file:vendor/salla.sa-embedded-sdk-0.3.0-checkout.ef676ce.tgz}
-    version: 0.3.0-checkout.ef676ce
+  '@salla.sa/embedded-sdk@file:vendor/salla.sa-embedded-sdk-0.2.7.tgz':
+    resolution: {integrity: sha512-0HRnDSQDX2YMhWvziiWlL2HAABNOsnjwzh7YMBQnoA37oW4kaPDs3qnSLD3bNzrgUQ0JOFuHljgrKDAn35Te9Q==, tarball: file:vendor/salla.sa-embedded-sdk-0.2.7.tgz}
+    version: 0.2.7
     engines: {node: '>=18'}
 
   '@sindresorhus/is@7.2.0':
@@ -3139,7 +3139,7 @@ snapshots:
   '@rollup/rollup-win32-x64-msvc@4.60.3':
     optional: true
 
-  '@salla.sa/embedded-sdk@file:vendor/salla.sa-embedded-sdk-0.3.0-checkout.ef676ce.tgz': {}
+  '@salla.sa/embedded-sdk@file:vendor/salla.sa-embedded-sdk-0.2.7.tgz': {}
 
   '@sindresorhus/is@7.2.0': {}
 
