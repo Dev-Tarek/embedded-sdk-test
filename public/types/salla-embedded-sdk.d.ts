@@ -84,6 +84,13 @@ export declare interface CheckoutCreateConfig {
 }
 
 /**
+ * Error thrown by checkout.create() when the input is malformed.
+ */
+export declare type CheckoutInputError = Error & {
+  code: "INVALID_CHECKOUT_INPUT";
+};
+
+/**
  * @fileoverview Type definitions for the checkout module.
  */
 /**
