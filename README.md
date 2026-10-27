@@ -39,6 +39,27 @@ pnpm dev
 pnpm build
 ```
 
+## Deployment
+
+The app is deployed as a single [Cloudflare Worker](https://developers.cloudflare.com/workers/) (free plan) configured in `wrangler.toml`:
+
+- The built `dist` folder is served as static assets, with single-page app fallback to `index.html`
+- `POST /api/verify-token` (`server/worker.js`) proxies token verification to the Salla exchange authority service
+- `ENV` (`dev` or `prod`, default `dev`) is set under `[vars]` and selects the verification backend
+
+Wrangler requires Node.js 22 or later.
+
+```bash
+# Run the built app and the Worker locally
+pnpm dev:worker
+
+# Log in to Cloudflare (once), then build and deploy
+npx wrangler login
+pnpm run deploy
+```
+
+Use the deployed `*.workers.dev` URL as the embedded page URL of your test app in Salla Partners.
+
 ## License
 
 MIT
