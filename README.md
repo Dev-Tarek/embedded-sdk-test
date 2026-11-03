@@ -45,7 +45,7 @@ The app is deployed as a single [Cloudflare Worker](https://developers.cloudflar
 
 - The built `dist` folder is served as static assets, with single-page app fallback to `index.html`
 - `POST /api/verify-token` (`server/worker.js`) proxies token verification to the Salla exchange authority service
-- `ENV` (`dev` or `prod`, default `dev`) is set under `[vars]` and selects the verification backend
+- `ENV` under `[vars]` selects the verification backend: `auto` (default) tries `prod` first and falls back to `dev` when prod cannot decrypt the token, so one deployment works with both the production and the dev merchant dashboard; `dev` or `prod` pins one
 
 Wrangler requires Node.js 22 or later.
 
