@@ -6,11 +6,23 @@
  * by proxying the request to the Salla exchange authority service.
  */
 
-// Same host for both environments; the `env` body field selects the backend
-const VERIFY_API_URLS = {
-  dev: "https://api.salla.dev/exchange-authority/v1/verify",
-  prod: "https://api.salla.dev/exchange-authority/v1/verify",
-};
+// One host for both environments; the `env` body field selects the backend
+const VERIFY_API_URL = "https://api.salla.dev/exchange-authority/v1/verify";
+const ENVIRONMENTS = ["prod", "dev"];
+
+/**
+ * Environments to try, in order. `ENV` pins one; unset or "auto" tries prod
+ * first and falls back to dev only when prod can't decrypt the token, so one
+ * deployment serves both the production and the dev merchant dashboard.
+ */
+function environmentsFor(env) {
+  const pinned = env.ENV && env.ENV !== "auto" ? env.ENV : null;
+  return pinned ? [pinned] : ENVIRONMENTS;
+}
+
+function isDecryptionFailure(status, result) {
+  return status === 422 && result?.error?.message === "Decryption failed";
+}
 
 const jsonHeaders = { "Content-Type": "application/json" };
 
@@ -41,50 +53,53 @@ async function handleVerifyToken(request, env) {
       return json({ success: false, error: "App ID is required" }, 400);
     }
 
-    // Determine environment (default to 'dev' when ENV is not set)
-    const environment = env.ENV || "dev";
-
-    // Get API URL based on environment
-    const apiUrl = VERIFY_API_URLS[environment];
-    if (!apiUrl) {
+    const environments = environmentsFor(env);
+    const invalid = environments.find((e) => !ENVIRONMENTS.includes(e));
+    if (invalid) {
       return json(
         {
           success: false,
-          error: `Invalid environment: ${environment}. Must be 'dev' or 'prod'`,
+          error: `Invalid environment: ${invalid}. Must be 'dev', 'prod' or 'auto'`,
         },
         400,
       );
     }
 
-    // Debug log request details
-    console.log("Verifying token with Salla API", {
-      apiUrl: apiUrl,
-      appId,
-      token: token ? "[REDACTED]" : undefined,
-      iss: iss || "merchant-dashboard",
-      subject: subject || "embedded-page",
-      env: environment,
-    });
-
-    // Make request to Salla API
-    const response = await fetch(apiUrl, {
-      method: "POST",
-      headers: {
-        "s-source": appId, // APP ID (dynamic)
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        token,
+    let response;
+    let result;
+    for (const environment of environments) {
+      // Debug log request details
+      console.log("Verifying token with Salla API", {
+        apiUrl: VERIFY_API_URL,
+        appId,
+        token: token ? "[REDACTED]" : undefined,
         iss: iss || "merchant-dashboard",
         subject: subject || "embedded-page",
         env: environment,
-      }),
-    });
+      });
 
-    // Debug log response status
-    console.log("Salla API response status:", response.status);
+      // Make request to Salla API
+      response = await fetch(VERIFY_API_URL, {
+        method: "POST",
+        headers: {
+          "s-source": appId, // APP ID (dynamic)
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          token,
+          iss: iss || "merchant-dashboard",
+          subject: subject || "embedded-page",
+          env: environment,
+        }),
+      });
 
-    const result = await response.json();
+      // Debug log response status
+      console.log("Salla API response status:", response.status);
+
+      result = await response.json();
+
+      if (!isDecryptionFailure(response.status, result)) break;
+    }
 
     // Return the result with appropriate status code
     return json(result, response.status, {
